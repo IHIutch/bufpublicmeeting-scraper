@@ -11,6 +11,9 @@ class MeetingsSpider(scrapy.Spider):
         for meeting in response.css('div.MeetingRow'):
             yield {
                 'date': meeting.css('div.RowTop div.RowLink a::text').get(),
+                'details': meeting.css('div.RowTop div.RowLink a::attr(title)').get(),
                 'subject': meeting.css('div.RowBottom div.RowDetails::text').get(),
                 'links': meeting.css('div.MeetingLinks div a::text').getall(),
             }
+
+# Run with `scrapy crawl meetings -o meetings.json` in the terminal
