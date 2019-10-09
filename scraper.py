@@ -15,4 +15,4 @@ class MeetingsSpider(scrapy.Spider):
                 'links': meeting.css('div.MeetingLinks div a::text').getall(),
             }
 
-# Run with `scrapy runspider scraper.py -o meetings.json` in the terminal
+# Run with `scrapy runspider scraper.py -o src/data/meetings.json` in the terminal
