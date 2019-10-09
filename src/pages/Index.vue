@@ -1,20 +1,17 @@
 <template>
-  <div>
-    <b-container>
-      <b-row>
-        <b-col cols="3"> </b-col>
-        <b-col cols="8">
-          <div
+  <Layout>
+
+              <div
             class="border rounded p-4 mb-4"
             v-for="(meeting, idx) in meetings"
             :key="idx"
           >
-            <div class="d-flex">
+            <div class="flex">
               <div>
                 <h1 class="h3">{{ meeting.subject }}</h1>
               </div>
             </div>
-            <div class="d-flex mb-3">
+            <div class="flex mb-3">
               <div>
                 <span class="text-muted font-weight-bold">
                   {{ meeting.date }}
@@ -25,7 +22,7 @@
               >
                 <a
                   href="#"
-                  class="d-inline-flex px-2"
+                  class="inline-flex px-2"
                   v-for="(link, idx) in meeting.links"
                   :key="idx"
                 >
@@ -35,21 +32,23 @@
             </div>
             <p v-html="meeting.details"></p>
           </div>
-        </b-col>
-      </b-row>
-    </b-container>
-  </div>
+
+
+  </Layout>
 </template>
 
 <script>
 import Meetings from "@/data/meetings.json";
 
 export default {
-  name: "Home",
-  data() {
+  metaInfo: {
+    title: 'Hello, world!'
+  },
+    data() {
     return {
       meetings: Meetings
     };
   }
-};
+
+}
 </script>

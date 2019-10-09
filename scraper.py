@@ -1,6 +1,5 @@
 import scrapy
 
-
 class MeetingsSpider(scrapy.Spider):
     name = "meetings"
     start_urls = [
