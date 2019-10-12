@@ -2,6 +2,7 @@
   "name": "project",
   "private": true,
   "scripts": {
+    "scrape": "scrapy runspider scraper.py --loglevel=DEBUG -t json -o - > src/data/meetings.json",
     "build": "gridsome build",
     "develop": "gridsome develop",
     "explore": "gridsome explore"
