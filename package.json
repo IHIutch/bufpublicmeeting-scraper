@@ -1,5 +1,5 @@
 {
-  "name": "project",
+  "name": "bufpublicmeetings",
   "private": true,
   "scripts": {
     "scrape": "scrapy runspider scraper.py --loglevel=DEBUG -t json -o - > src/data/meetings.json",
@@ -9,5 +9,12 @@
   },
   "dependencies": {
     "gridsome": "^0.7.0"
+  },
+  "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^1.3.0",
+    "autoprefixer": "^9.6.4",
+    "node-sass": "^4.12.0",
+    "sass-loader": "^8.0.0",
+    "tailwindcss": "^1.1.2"
   }
 }
