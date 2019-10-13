@@ -8,7 +8,7 @@ jobs:
       cache: npm
       script:
         - npm i
-        - gridsome build
+        - npm run build
       deploy:
         provider: pages
         local_dir: dist/
