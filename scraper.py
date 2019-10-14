@@ -17,41 +17,60 @@ class MeetingsSpider(scrapy.Spider):
         'http://buffalony.iqm2.com/Citizens/Calendar.aspx'
     ]
 
-    def parse_meeting(self, response):
-        meetingTitle = response.css(
-            'span#ContentPlaceholder1_lblMeetingGroup::text').get()
+    id = ''
 
-        return {'meetingTitle': meetingTitle}
+    # def parse_meeting(self, response):
+    #     self.obj[self.id]['downloads'] = []
+    #     for download in response.css('div#ContentPlaceholder1_pnlDownloads'):
+    #         linkUrl = download.css('a.Link::attr(href)').get()
+    #         linkText = download.css('a.Link::text').get()
+    #         self.obj[self.id]['downloads'].append({
+    #             'linkText': linkUrl,
+    #             'linkUrl': linkText
+    #         })
+
+    # self.obj[self.id]['minutes'] = {
+    #     'linkText': response.css('a.Link::attr(href)')
+    #     'linkUrl': response.css('a.Link::text')
+    # }
 
     def parse(self, response):
+
         for meeting in response.css('div.MeetingRow'):
-            links = []
             meetingLink = meeting.css(
                 'div.RowTop div.RowLink a::attr(href)').get()
-            date = meeting.css('div.RowTop div.RowLink a::text').get()
-            details = meeting.css(
+            self.id = meetingLink.split('ID=')[1]
+
+            obj = {}
+
+            obj['meetingId'] = self.id
+
+            obj['meetingLink'] = meetingLink
+
+            obj['date'] = meeting.css(
+                'div.RowTop div.RowLink a::text').get()
+
+            obj['details'] = meeting.css(
                 'div.RowTop div.RowLink a::attr(title)').get()
-            subject = meeting.css('div.RowBottom div.RowDetails::text').get()
-            linkText = meeting.css(
-                'div.MeetingLinks div a::text').getall()
-            linkHref = meeting.css(
-                'div.MeetingLinks div a::attr(href)').getall()
 
-            links.append({
-                'text': linkText,
-                'link': linkHref
-            })
+            obj['meetingType'] = meeting.css(
+                'div.RowBottom div.RowDetails::text').get()
 
-            if meetingLink is not None:
-                yield response.follow(
-                    meetingLink, callback=self.parse_meeting)
+            obj['links'] = []
+
+            for link in meeting.css('div.MeetingLinks'):
+                obj['links'].append({
+                    'linkText': link.css('div a::text').get(),
+                    'linkUrl': link.css('div a::attr(href)').get()
+                })
+                # obj[self.id]['links'].append(temp)
+
+            # if meetingLink is not None:
+            #     yield response.follow(
+            #         meetingLink, callback=self.parse_meeting)
 
             yield {
-                'meetingLink': meetingLink,
-                'date': date,
-                'details': details,
-                'subject': subject,
-                'links': links,
+                self.id: obj
             }
 
 # Run with `scrapy runspider scraper.py -t json -o - > src/data/meetings.json` in the terminal

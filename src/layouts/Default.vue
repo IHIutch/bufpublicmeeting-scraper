@@ -1,15 +1,61 @@
 <template>
-  <div class="layout">
-    <header class="header">
-      <strong>
-        <g-link to="/">{{ $static.metadata.siteName }}</g-link>
-      </strong>
-      <nav class="nav">
-        <g-link class="nav__link" to="/">Home</g-link>
-        <g-link class="nav__link" to="/about/">About</g-link>
-      </nav>
-    </header>
-    <slot/>
+  <div class="flex container mx-auto">
+    <div class="w-1/4 px-4">
+      <div class="sticky top-0 pt-4">
+        <h2 class="font-medium text-2xl mb-2">
+          Sorting &amp; Filters
+        </h2>
+        <div class="border rounded p-2 mb-4">
+          <fieldset>
+            <legend class="font-medium text-xl">Sort by:</legend>
+            <div>
+              <input type="radio" name="sorting" />
+              <label>Meeting Name (Asc)</label>
+            </div>
+            <div>
+              <input type="radio" name="sorting" />
+              <label>Meeting Name (Desc)</label>
+            </div>
+            <div>
+              <input type="radio" name="sorting" />
+              <label>Meeting Date (Asc)</label>
+            </div>
+            <div>
+              <input type="radio" name="sorting" />
+              <label>Meeting Date (Desc)</label>
+            </div>
+          </fieldset>
+        </div>
+        <div class="border rounded p-2">
+          <fieldset>
+            <legend class="font-medium text-xl">Filter Meeting Type:</legend>
+            <div>
+              <input
+                type="checkbox"
+                name="filtering"
+                id="legislation_committee"
+              />
+              <label for="legislation_committee">Legislation Committee</label>
+            </div>
+            <div>
+              <input type="checkbox" name="filtering" />
+              <label>Preservation Board</label>
+            </div>
+            <div>
+              <input type="checkbox" name="filtering" />
+              <label>Bicycle and Pedestrian Advisory Board</label>
+            </div>
+            <div>
+              <input type="checkbox" name="filtering" />
+              <label>Common Council</label>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+    <div class="w-3/4 px-4">
+      <slot />
+    </div>
   </div>
 </template>
 
@@ -20,31 +66,3 @@ query {
   }
 }
 </static-query>
-
-<style>
-body {
-  font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  margin:0;
-  padding:0;
-  line-height: 1.5;
-}
-
-.layout {
-  max-width: 760px;
-  margin: 0 auto;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  height: 80px;
-}
-
-.nav__link {
-  margin-left: 20px;
-}
-</style>
