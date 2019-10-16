@@ -53,8 +53,12 @@ class MeetingsSpider(scrapy.Spider):
             obj['details'] = meeting.css(
                 'div.RowTop div.RowLink a::attr(title)').get()
 
-            obj['meetingType'] = meeting.css(
+            meetingTypeGroup = meeting.css(
                 'div.RowBottom div.RowDetails::text').get()
+
+            obj['meetingGroup'] = meetingTypeGroup.split(' - ')[0]
+
+            obj['meetingType'] = meetingTypeGroup.split(' - ')[1]
 
             obj['links'] = []
 

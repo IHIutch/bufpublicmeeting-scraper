@@ -1,11 +1,11 @@
 <template>
   <Layout>
-    <aside class="w-1/4">
-      <div class="sticky top-0 pt-4">
+    <aside class="w-1/4 sticky top-0 h-screen overflow-y-scroll px-3">
+      <div class="my-5">
         <h2 class="font-medium text-2xl mb-2">
           Sorting &amp; Filters
         </h2>
-        <div class="border rounded p-2 mb-4">
+        <div class="border rounded p-3 mb-4">
           <fieldset>
             <legend class="font-medium text-xl">Sort by:</legend>
             <div>
@@ -26,30 +26,31 @@
             </div>
           </fieldset>
         </div>
-        <div class="border rounded p-2">
+        <div class="border rounded p-3">
           <fieldset>
             <legend class="font-medium text-xl">Filter Meeting Type:</legend>
             <div v-for="(types, index) in filterTypes" :key="index">
               <input type="checkbox" name="filtering" :id="index" />
-              <label :for="index">
-                {{ filterTypes[index][0].meetingType }}
-              </label>
-              <span class="text-white bg-blue-500 p-1 rounded">{{
-                filterTypes[index].length
-              }}</span>
+              <label :for="index" class="cursor-pointer hover:underline">{{
+                filterTypes[index][0].meetingGroup
+              }}</label>
+              <span
+                class="text-white bg-blue-500 p-1 rounded-full text-xs font-medium"
+                >{{ filterTypes[index].length }}
+              </span>
             </div>
           </fieldset>
         </div>
       </div>
     </aside>
-    <main class="w-3/4">
+    <main class="w-3/4 ml-auto px-3">
       <div v-for="(meeting, idx) in meetings" :key="idx">
         <template v-if="moment() < moment(meeting.date)">
           <div class="border rounded p-4 mb-4">
             <div class="flex">
               <h2 class="text-2xl font-medium">
                 <g-link :to="meeting.meetingId" class="hover:underline">
-                  {{ meeting.meetingType }}
+                  {{ meeting.meetingGroup }} - {{ meeting.meetingType }}
                 </g-link>
               </h2>
             </div>
@@ -112,7 +113,7 @@ export default {
     filterTypes() {
       let obj = {};
       this.meetings.forEach(meeting => {
-        let type = meeting.meetingType;
+        let type = meeting.meetingGroup;
         type = type
           .split(" - ")
           .join("-")
