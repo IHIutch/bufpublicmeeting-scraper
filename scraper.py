@@ -1,16 +1,8 @@
 import scrapy
-import logging
-
-from scrapy.utils.log import configure_logging
+import copy
 
 
 class MeetingsSpider(scrapy.Spider):
-    configure_logging(install_root_handler=False)
-    logging.basicConfig(
-        filename='log.txt',
-        format='%(levelname)s: %(message)s',
-        level=logging.INFO
-    )
 
     name = "meetings"
     start_urls = [
@@ -63,10 +55,17 @@ class MeetingsSpider(scrapy.Spider):
             obj['links'] = []
 
             for link in meeting.css('div.MeetingLinks'):
+                linksText = link.css('div a::text').getall(),
+                linksUrl = link.css('div a::attr(href)').getall()
+
+            count = 0
+            for link in linksText[0]:
                 obj['links'].append({
-                    'linkText': link.css('div a::text').get(),
-                    'linkUrl': link.css('div a::attr(href)').get()
+                    'linkText': linksText[0][count] if linksText[0] else '',
+                    'linkUrl': linksUrl[count] if linksUrl[0] else '',
                 })
+                count += 1
+
                 # obj[self.id]['links'].append(temp)
 
             # if meetingLink is not None:
