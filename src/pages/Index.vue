@@ -26,24 +26,45 @@
             </div>
           </fieldset>
         </div>
+        <div class="border rounded p-3 mb-4">
+          <label
+            for="showPrevious"
+            class="cursor-pointer hover:underline flex items-center py-1"
+          >
+            <input
+              class="mr-2 cursor-pointer"
+              type="checkbox"
+              name="showPrevious"
+              id="showPrevious"
+              :value="true"
+              v-model="showPrevious"
+            /><span>Show Past Meetings</span>
+          </label>
+        </div>
         <div class="border rounded p-3">
           <fieldset>
             <legend class="font-medium text-xl">Filter Meeting Type:</legend>
             <div v-for="(group, index) in filterGroups" :key="index">
-              <input
-                type="checkbox"
-                name="filtering"
-                :id="index"
-                :value="index"
-                v-model="filters"
-              />
-              <label :for="index" class="cursor-pointer hover:underline"
-                >{{ group.text }}
+              <label
+                :for="index"
+                class="cursor-pointer hover:underline flex items-center py-1"
+              >
+                <input
+                  class="mr-2 cursor-pointer"
+                  type="checkbox"
+                  name="filtering"
+                  :id="index"
+                  :value="index"
+                  v-model="filters"
+                />
+                <div>
+                  <span class="mr-2">{{ group.text }}</span>
+                  <span
+                    class="text-white bg-blue-500 p-1 rounded-full text-xs font-medium"
+                    >{{ group.values.length }}
+                  </span>
+                </div>
               </label>
-              <span
-                class="text-white bg-blue-500 p-1 rounded-full text-xs font-medium"
-                >{{ group.values.length }}
-              </span>
             </div>
           </fieldset>
         </div>
@@ -99,15 +120,13 @@ export default {
   data() {
     return {
       meetings: [],
-      filters: []
+      filters: [],
+      showPrevious: false
     };
   },
   methods: {
     moment(value) {
       return moment(value);
-    },
-    shuffle() {
-      this.filteredMeetings = _.shuffle(this.filteredMeetings);
     }
   },
   created() {
@@ -139,17 +158,15 @@ export default {
       return obj;
     },
     filteredMeetings() {
-      let arr = [];
-      if (this.filters.length == 0) {
-        arr = this.meetings.filter(meeting => {
+      let arr = this.meetings;
+      if (!this.showPrevious) {
+        arr = arr.filter(meeting => {
           return moment() < moment(meeting.date);
         });
-      } else {
-        arr = this.meetings.filter(meeting => {
-          return (
-            this.filters.indexOf(meeting.meetingGroup.value) !== -1 &&
-            moment() < moment(meeting.date)
-          );
+      }
+      if (this.filters.length > 0) {
+        arr = arr.filter(meeting => {
+          return this.filters.indexOf(meeting.meetingGroup.value) !== -1;
         });
       }
       return arr;
@@ -162,9 +179,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.flip-list-move {
-  transition: transform 1s;
-}
-</style>
