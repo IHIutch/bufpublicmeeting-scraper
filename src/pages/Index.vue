@@ -16,20 +16,6 @@
                   class="mr-2"
                   type="radio"
                   name="sorting"
-                  :value="{ value: 'date', direction: 'desc' }"
-                  v-model="orderBy"
-                />
-                <span>Meeting Date (Desc)</span></label
-              >
-            </div>
-            <div>
-              <label
-                class="cursor-pointer hover:underline flex items-center py-1"
-              >
-                <input
-                  class="mr-2"
-                  type="radio"
-                  name="sorting"
                   :value="{ value: 'date', direction: 'asc' }"
                   v-model="orderBy"
                 />
@@ -44,10 +30,10 @@
                   class="mr-2"
                   type="radio"
                   name="sorting"
-                  :value="{ value: 'meetingGroup.text', direction: 'desc' }"
+                  :value="{ value: 'date', direction: 'desc' }"
                   v-model="orderBy"
                 />
-                <span>Meeting Name (Desc)</span></label
+                <span>Meeting Date (Desc)</span></label
               >
             </div>
             <div>
@@ -62,6 +48,20 @@
                   v-model="orderBy"
                 />
                 <span>Meeting Name (Asc)</span></label
+              >
+            </div>
+            <div>
+              <label
+                class="cursor-pointer hover:underline flex items-center py-1"
+              >
+                <input
+                  class="mr-2"
+                  type="radio"
+                  name="sorting"
+                  :value="{ value: 'meetingGroup.text', direction: 'desc' }"
+                  v-model="orderBy"
+                />
+                <span>Meeting Name (Desc)</span></label
               >
             </div>
           </fieldset>
@@ -163,13 +163,8 @@ export default {
       meetings: [],
       filters: [],
       showPrevious: false,
-      orderBy: { value: "date", direction: "desc" }
+      orderBy: { value: "date", direction: "asc" }
     };
-  },
-  methods: {
-    moment(value) {
-      return moment(value);
-    }
   },
   created() {
     MeetingsData.forEach(meeting => {
@@ -181,6 +176,7 @@ export default {
           .toLowerCase(),
         text: meeting[key]["meetingGroup"]
       };
+      meeting[key]["date"] = new Date(meeting[key]["date"]);
       this.meetings.push(meeting[key]);
     });
   },
@@ -217,7 +213,7 @@ export default {
   },
   filters: {
     moment(value) {
-      return moment(value).format("MMMM D, YYYY");
+      return moment(value).format("MMMM D, YYYY - h:mmA");
     }
   }
 };
