@@ -9,20 +9,60 @@
           <fieldset>
             <legend class="font-medium text-xl">Sort by:</legend>
             <div>
-              <input type="radio" name="sorting" />
-              <label>Meeting Name (Asc)</label>
+              <label
+                class="cursor-pointer hover:underline flex items-center py-1"
+              >
+                <input
+                  class="mr-2"
+                  type="radio"
+                  name="sorting"
+                  :value="{ value: 'date', direction: 'desc' }"
+                  v-model="orderBy"
+                />
+                <span>Meeting Date (Desc)</span></label
+              >
             </div>
             <div>
-              <input type="radio" name="sorting" />
-              <label>Meeting Name (Desc)</label>
+              <label
+                class="cursor-pointer hover:underline flex items-center py-1"
+              >
+                <input
+                  class="mr-2"
+                  type="radio"
+                  name="sorting"
+                  :value="{ value: 'date', direction: 'asc' }"
+                  v-model="orderBy"
+                />
+                <span>Meeting Date (Asc)</span></label
+              >
             </div>
             <div>
-              <input type="radio" name="sorting" />
-              <label>Meeting Date (Asc)</label>
+              <label
+                class="cursor-pointer hover:underline flex items-center py-1"
+              >
+                <input
+                  class="mr-2"
+                  type="radio"
+                  name="sorting"
+                  :value="{ value: 'meetingGroup.text', direction: 'desc' }"
+                  v-model="orderBy"
+                />
+                <span>Meeting Name (Desc)</span></label
+              >
             </div>
             <div>
-              <input type="radio" name="sorting" />
-              <label>Meeting Date (Desc)</label>
+              <label
+                class="cursor-pointer hover:underline flex items-center py-1"
+              >
+                <input
+                  class="mr-2"
+                  type="radio"
+                  name="sorting"
+                  :value="{ value: 'meetingGroup.text', direction: 'asc' }"
+                  v-model="orderBy"
+                />
+                <span>Meeting Name (Asc)</span></label
+              >
             </div>
           </fieldset>
         </div>
@@ -111,6 +151,7 @@
 <script>
 import MeetingsData from "@/data/meetings.json";
 import moment from "moment";
+import _ from "lodash";
 
 export default {
   name: "Index",
@@ -121,7 +162,8 @@ export default {
     return {
       meetings: [],
       filters: [],
-      showPrevious: false
+      showPrevious: false,
+      orderBy: { value: "date", direction: "desc" }
     };
   },
   methods: {
@@ -169,6 +211,7 @@ export default {
           return this.filters.indexOf(meeting.meetingGroup.value) !== -1;
         });
       }
+      arr = _.orderBy(arr, this.orderBy.value, this.orderBy.direction);
       return arr;
     }
   },
