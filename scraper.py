@@ -11,15 +11,26 @@ class MeetingsSpider(scrapy.Spider):
 
     id = ''
 
-    # def parse_meeting(self, response):
-    #     self.obj[self.id]['downloads'] = []
-    #     for download in response.css('div#ContentPlaceholder1_pnlDownloads'):
-    #         linkUrl = download.css('a.Link::attr(href)').get()
-    #         linkText = download.css('a.Link::text').get()
-    #         self.obj[self.id]['downloads'].append({
-    #             'linkText': linkUrl,
-    #             'linkUrl': linkText
-    #         })
+    def parse_meeting(self, response):
+        obj = response.meta['obj']
+        meetingId = response.meta['meetingId']
+
+        obj['internalLinks'] = []
+        for download in response.css('div#ContentPlaceholder1_pnlDownloads'):
+            linksText = download.css('a.Link::text').getall()
+            linksUrl = download.css('a.Link::attr(href)').getall()
+
+            count = 0
+            for link in linksText:
+                obj['internalLinks'].append({
+                    'linkText': linksText[count] if linksText[0] else '',
+                    'linkUrl': linksUrl[count] if linksUrl[0] else '',
+                })
+                count += 1
+
+        yield {
+            meetingId: obj
+        }
 
     # self.obj[self.id]['minutes'] = {
     #     'linkText': response.css('a.Link::attr(href)')
@@ -68,12 +79,12 @@ class MeetingsSpider(scrapy.Spider):
 
                 # obj[self.id]['links'].append(temp)
 
-            # if meetingLink is not None:
-            #     yield response.follow(
-            #         meetingLink, callback=self.parse_meeting)
+            if meetingLink is not None:
+                yield response.follow(
+                    meetingLink, callback=self.parse_meeting, meta={'obj': obj, 'meetingId': self.id})
 
-            yield {
-                self.id: obj
-            }
+            # yield {
+            #     self.id: obj
+            # }
 
 # Run with `scrapy runspider scraper.py -t json -o - > src/data/meetings.json` in the terminal
