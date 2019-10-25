@@ -16,7 +16,7 @@ module.exports = {
   templates: {
     Meeting: [
       {
-        path: "/:meetingId",
+        path: "/:meetingGroupUrlify/:meetingTypeUrlify/:meetingId",
         component: "./src/templates/MeetingTemplate.vue"
       }
     ]

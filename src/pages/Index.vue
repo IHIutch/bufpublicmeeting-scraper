@@ -115,8 +115,9 @@
         <div class="border rounded p-4 mb-4">
           <div class="flex">
             <h2 class="text-2xl font-medium">
-              <g-link :to="meeting.meetingId" class="hover:underline">
-                {{ meeting.meetingGroup.text }} - {{ meeting.meetingType.text }}
+              <g-link :to="meeting.path" class="hover:underline">
+                {{ meeting.meetingGroup.text }} -
+                {{ meeting.meetingType.text }}
               </g-link>
             </h2>
           </div>
@@ -148,6 +149,32 @@
   </Layout>
 </template>
 
+<page-query>
+query {
+  allMeeting {
+    edges {
+      node {
+        details,
+        links{
+          linkUrl,
+          linkText
+        }
+        meetingGroup{
+          text, 
+          value
+        },
+        meetingType{
+          text, 
+          value
+        },
+        date,
+        path
+      }
+    }
+  }
+}
+</page-query>
+
 <script>
 import MeetingsData from "@/data/meetings.json";
 import moment from "moment";
@@ -160,37 +187,16 @@ export default {
   },
   data() {
     return {
-      meetings: [],
       filters: [],
       showPrevious: false,
       orderBy: { value: "date", direction: "asc" }
     };
   },
-  created() {
-    MeetingsData.forEach(meeting => {
-      let key = Object.keys(meeting)[0];
-      meeting[key]["meetingGroup"] = {
-        value: meeting[key]["meetingGroup"]
-          .split(" ")
-          .join("-")
-          .toLowerCase(),
-        text: meeting[key]["meetingGroup"]
-      };
-      meeting[key]["meetingType"] = {
-        value: meeting[key]["meetingType"]
-          .split(" ")
-          .join("-")
-          .toLowerCase(),
-        text: meeting[key]["meetingType"]
-      };
-      meeting[key]["date"] = new Date(meeting[key]["date"]);
-      this.meetings.push(meeting[key]);
-    });
-  },
   computed: {
     filterGroups() {
       let obj = {};
-      this.meetings.forEach(meeting => {
+      this.$page.allMeeting.edges.forEach(meeting => {
+        meeting = meeting.node;
         let groupIdx = meeting.meetingGroup.value;
         if (!Object.keys(obj).includes(groupIdx)) {
           obj[groupIdx] = {
@@ -203,7 +209,10 @@ export default {
       return obj;
     },
     filteredMeetings() {
-      let arr = this.meetings;
+      let arr = [];
+      this.$page.allMeeting.edges.forEach(meeting => {
+        arr.push(meeting.node);
+      });
       if (!this.showPrevious) {
         arr = arr.filter(meeting => {
           return moment() < moment(meeting.date);

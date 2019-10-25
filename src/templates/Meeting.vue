@@ -10,8 +10,8 @@
 </template>
 
 <page-query>
-  query Meeting ($id: ID) {
-    meeting (id: $id) {
+  query Meeting ($path: String) {
+    meeting (path: $path) {
       id,
       internalLinks{
         linkText,
@@ -22,8 +22,6 @@
 </page-query>
 
 <script>
-import MeetingsData from "@/data/meetings.json";
-
 export default {
   name: "MeetingTemplate",
   data() {

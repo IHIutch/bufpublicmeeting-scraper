@@ -15,28 +15,31 @@ module.exports = function(api) {
 
     MeetingsData.forEach(meeting => {
       let key = Object.keys(meeting)[0];
-      meeting[key]["id"] = meeting[key].meetingId;
-      meeting[key]["meetingGroup"] = [
-        {
-          value: meeting[key]["meetingGroup"]
-            .split(" ")
-            .join("-")
-            .toLowerCase(),
-          text: meeting[key]["meetingGroup"]
-        }
-      ];
-      meeting[key]["meetingType"] = [
-        {
-          value: meeting[key]["meetingType"]
-            .split(" ")
-            .join("-")
-            .toLowerCase(),
-          text: meeting[key]["meetingType"]
-        }
-      ];
-      meeting[key]["date"] = new Date(meeting[key]["date"]);
 
-      // console.log(meeting[key]);
+      var groupUrlify = meeting[key]["meetingGroup"]
+        .split(" ")
+        .join("-")
+        .toLowerCase();
+
+      var typeUrlify = meeting[key]["meetingType"]
+        .split(" ")
+        .join("-")
+        .toLowerCase();
+
+      meeting[key]["id"] = meeting[key].meetingId;
+      meeting[key]["meetingGroupUrlify"] = groupUrlify;
+      meeting[key]["meetingGroup"] = {
+        value: groupUrlify,
+        text: meeting[key]["meetingGroup"]
+      };
+      meeting[key]["meetingTypeUrlify"] = typeUrlify;
+      meeting[key]["meetingType"] = {
+        value: typeUrlify,
+        text: meeting[key]["meetingType"]
+      };
+      meeting[key]["date"] = new Date(meeting[key]["date"]);
+      meeting[key]["path"] =
+        groupUrlify + "/" + typeUrlify + meeting[key].meetingId;
 
       contentType.addNode(meeting[key]);
     });
