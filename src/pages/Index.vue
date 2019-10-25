@@ -116,7 +116,7 @@
           <div class="flex">
             <h2 class="text-2xl font-medium">
               <g-link :to="meeting.meetingId" class="hover:underline">
-                {{ meeting.meetingGroup.text }} - {{ meeting.meetingType }}
+                {{ meeting.meetingGroup.text }} - {{ meeting.meetingType.text }}
               </g-link>
             </h2>
           </div>
@@ -175,6 +175,13 @@ export default {
           .join("-")
           .toLowerCase(),
         text: meeting[key]["meetingGroup"]
+      };
+      meeting[key]["meetingType"] = {
+        value: meeting[key]["meetingType"]
+          .split(" ")
+          .join("-")
+          .toLowerCase(),
+        text: meeting[key]["meetingType"]
       };
       meeting[key]["date"] = new Date(meeting[key]["date"]);
       this.meetings.push(meeting[key]);
