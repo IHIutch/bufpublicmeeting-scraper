@@ -16,9 +16,9 @@ class MeetingsSpider(scrapy.Spider):
         meetingId = response.meta['meetingId']
 
         obj['internalLinks'] = []
-        for download in response.css('div#ContentPlaceholder1_pnlDownloads'):
-            linksText = download.css('a.Link::text').getall()
-            linksUrl = download.css('a.Link::attr(href)').getall()
+        for download in response.css('table#MeetingDetail td.Title'):
+            linksText = download.css('a::text').getall()
+            linksUrl = download.css('a::attr(href)').getall()
 
             count = 0
             for link in linksText:
