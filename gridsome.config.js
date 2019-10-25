@@ -13,6 +13,14 @@ if (process.env.NODE_ENV === "production") postcssPlugins.push(purgecss());
 
 module.exports = {
   siteName: "Gridsome",
+  templates: {
+    Meeting: [
+      {
+        path: "/:meetingId",
+        component: "./src/templates/MeetingTemplate.vue"
+      }
+    ]
+  },
   plugins: [],
   css: {
     loaderOptions: {
