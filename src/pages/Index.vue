@@ -18,6 +18,7 @@
                   name="sorting"
                   :value="{ value: 'date', direction: 'asc' }"
                   v-model="orderBy"
+                  @change="updateRouteQuery()"
                 />
                 <span>Meeting Date (Asc)</span></label
               >
@@ -32,6 +33,7 @@
                   name="sorting"
                   :value="{ value: 'date', direction: 'desc' }"
                   v-model="orderBy"
+                  @change="updateRouteQuery()"
                 />
                 <span>Meeting Date (Desc)</span></label
               >
@@ -46,6 +48,7 @@
                   name="sorting"
                   :value="{ value: 'meetingGroup.text', direction: 'asc' }"
                   v-model="orderBy"
+                  @change="updateRouteQuery()"
                 />
                 <span>Meeting Name (Asc)</span></label
               >
@@ -60,6 +63,7 @@
                   name="sorting"
                   :value="{ value: 'meetingGroup.text', direction: 'desc' }"
                   v-model="orderBy"
+                  @change="updateRouteQuery()"
                 />
                 <span>Meeting Name (Desc)</span></label
               >
@@ -96,6 +100,7 @@
                   :id="index"
                   :value="index"
                   v-model="filters"
+                  @change="updateRouteQuery()"
                 />
                 <div>
                   <span class="mr-2">{{ group.text }}</span>
@@ -189,8 +194,27 @@ export default {
     return {
       filters: [],
       showPrevious: false,
-      orderBy: { value: "date", direction: "asc" }
+      orderBy: {}
     };
+  },
+  created() {
+    this.orderBy = this.$route.query.orderBy
+      ? {
+          value: this.$route.query.orderBy[0],
+          direction: this.$route.query.orderBy[1]
+        }
+      : { value: "date", direction: "asc" };
+    this.filters = this.$route.query.filters ? this.$route.query.filters : [];
+  },
+  methods: {
+    updateRouteQuery() {
+      this.$router.replace({
+        query: {
+          filters: this.filters,
+          orderBy: [this.orderBy.value, this.orderBy.direction]
+        }
+      });
+    }
   },
   computed: {
     filterGroups() {
