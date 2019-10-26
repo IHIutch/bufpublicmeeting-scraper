@@ -82,6 +82,7 @@
               id="showPrevious"
               :value="true"
               v-model="showPrevious"
+              @change="updateRouteQuery()"
             /><span>Show Past Meetings</span>
           </label>
         </div>
@@ -198,6 +199,7 @@ export default {
     };
   },
   created() {
+    this.showPrevious = this.$route.query.showPrevious ? true : false;
     this.orderBy = this.$route.query.orderBy
       ? {
           value: this.$route.query.orderBy[0],
@@ -208,11 +210,13 @@ export default {
   },
   methods: {
     updateRouteQuery() {
+      var query = {};
+      query["filters"] = this.filters.length ? this.filters : undefined;
+      query["orderBy"] = [this.orderBy.value, this.orderBy.direction];
+      query["showPrevious"] = this.showPrevious ? true : undefined;
+
       this.$router.replace({
-        query: {
-          filters: this.filters,
-          orderBy: [this.orderBy.value, this.orderBy.direction]
-        }
+        query: query
       });
     }
   },
