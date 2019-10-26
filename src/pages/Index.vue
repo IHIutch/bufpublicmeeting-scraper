@@ -89,6 +89,13 @@
         <div class="border rounded p-3">
           <fieldset>
             <legend class="font-medium text-xl">Filter Meeting Type:</legend>
+            <button
+              v-if="filters.length"
+              class="cursor-pointer hover:underline text-teal-700 focus:outline-none"
+              @click="clearFilters()"
+            >
+              Clear Filters
+            </button>
             <div v-for="(group, index) in filterGroups" :key="index">
               <label
                 :for="index"
@@ -209,6 +216,10 @@ export default {
     this.filters = this.$route.query.filters ? this.$route.query.filters : [];
   },
   methods: {
+    clearFilters() {
+      this.filters = [];
+      this.updateRouteQuery();
+    },
     updateRouteQuery() {
       var query = {};
       query["filters"] = this.filters.length ? this.filters : undefined;
