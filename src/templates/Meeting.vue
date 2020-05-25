@@ -1,14 +1,21 @@
 <template>
-  <main role="main" class="container mx-auto">
-    <h1 class="text-3xl">{{ title }}</h1>
-    <div>{{ $page.meeting.date | dayjs }}</div>
-    <div>{{ $page.meeting.details }}</div>
-    <div v-for="(link, index) in $page.meeting.internalLinks" :key="index">
-      <a class="text-green-500 hover:underline" :href="link.linkUrl">{{
-        link.linkText
-      }}</a>
-    </div>
-  </main>
+  <Layout>
+    <main role="main">
+      <h1 class="text-3xl">{{ title }}</h1>
+      <div>{{ $page.meeting.date | dayjs }}</div>
+      <div>{{ $page.meeting.details }}</div>
+      <ul class="list-disc pl-4">
+        <li v-for="(link, index) in $page.meeting.internalLinks" :key="index">
+          <a
+            class="text-teal-700 hover:text-teal-900 hover:underline"
+            :href="link.linkUrl"
+          >
+            {{ link.linkText }}
+          </a>
+        </li>
+      </ul>
+    </main>
+  </Layout>
 </template>
 
 <page-query>

@@ -140,18 +140,13 @@
               </span>
             </div>
           </div>
-          <div>
-            <div
-              class="d-flex align-items-center justify-content-end flex-grow-1"
-            >
-              <a
-                :href="link.linkUrl"
-                class="inline-flex px-2 text-teal-700 hover:underline"
-                v-for="(link, idx) in meeting.links"
-                :key="idx"
-              >
-                {{ link.linkText }}
-              </a>
+          <div class="mb-4">
+            <div class="flex -mx-4">
+              <div class="px-4" v-for="(link, idx) in meeting.links" :key="idx">
+                <a :href="link.linkUrl" class="text-teal-700 hover:underline">
+                  {{ link.linkText }}
+                </a>
+              </div>
             </div>
           </div>
           <p v-html="meeting.details"></p>
