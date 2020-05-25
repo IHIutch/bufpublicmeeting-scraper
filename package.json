@@ -8,6 +8,7 @@
     "explore": "gridsome explore"
   },
   "dependencies": {
+    "@gridsome/plugin-sitemap": "^0.2.3",
     "dayjs": "^1.8.27",
     "gridsome": "^0.7.14"
   },

@@ -17,16 +17,20 @@ module.exports = {
     Meeting: [
       {
         path: "/:meetingGroupUrlify/:meetingTypeUrlify/:meetingId",
-        component: "./src/templates/MeetingTemplate.vue"
-      }
-    ]
+        component: "./src/templates/MeetingTemplate.vue",
+      },
+    ],
   },
-  plugins: [],
+  plugins: [
+    {
+      use: "@gridsome/plugin-sitemap",
+    },
+  ],
   css: {
     loaderOptions: {
       postcss: {
-        plugins: postcssPlugins
-      }
-    }
-  }
+        plugins: postcssPlugins,
+      },
+    },
+  },
 };

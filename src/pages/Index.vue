@@ -143,7 +143,10 @@
           <div class="mb-4">
             <div class="flex -mx-4">
               <div class="px-4" v-for="(link, idx) in meeting.links" :key="idx">
-                <a :href="link.linkUrl" class="text-teal-700 hover:underline">
+                <a
+                  :href="link.linkUrl"
+                  class="text-teal-700 hover:text-teal-900 hover:underline"
+                >
                   {{ link.linkText }}
                 </a>
               </div>

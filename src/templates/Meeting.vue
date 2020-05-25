@@ -43,8 +43,10 @@ import dayjs from "dayjs";
 
 export default {
   name: "MeetingTemplate",
-  data() {
-    return {};
+  metaInfo() {
+    return {
+      title: this.title,
+    };
   },
   computed: {
     title() {
