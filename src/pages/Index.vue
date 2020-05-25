@@ -46,7 +46,7 @@
                   class="mr-2"
                   type="radio"
                   name="sorting"
-                  :value="{ value: 'meetingGroup.text', direction: 'asc' }"
+                  :value="{ value: 'title', direction: 'asc' }"
                   v-model="orderBy"
                   @change="updateRouteQuery()"
                 />
@@ -61,7 +61,7 @@
                   class="mr-2"
                   type="radio"
                   name="sorting"
-                  :value="{ value: 'meetingGroup.text', direction: 'desc' }"
+                  :value="{ value: 'title', direction: 'desc' }"
                   v-model="orderBy"
                   @change="updateRouteQuery()"
                 />
@@ -129,8 +129,7 @@
           <div class="flex">
             <h2 class="text-2xl font-medium">
               <g-link :to="meeting.path" class="hover:underline">
-                {{ meeting.meetingGroup.text }} -
-                {{ meeting.meetingType.text }}
+                {{ meeting.title }}
               </g-link>
             </h2>
           </div>
@@ -235,11 +234,11 @@ export default {
     filterGroups() {
       let obj = {};
       this.$page.allMeeting.edges.forEach((meeting) => {
-        meeting = meeting.node;
-        let groupIdx = meeting.meetingGroup.value;
+        let curMeeting = meeting.node;
+        let groupIdx = curMeeting.meetingGroup.value;
         if (!Object.keys(obj).includes(groupIdx)) {
           obj[groupIdx] = {
-            text: meeting.meetingGroup.text,
+            text: curMeeting.meetingGroup.text,
             values: [],
           };
         }
@@ -248,9 +247,14 @@ export default {
       return obj;
     },
     filteredMeetings() {
-      let arr = [];
-      this.$page.allMeeting.edges.forEach((meeting) => {
-        arr.push(meeting.node);
+      let arr = this.$page.allMeeting.edges.map((meeting) => {
+        let curMeeting = meeting.node;
+        return {
+          ...curMeeting,
+          title: `${curMeeting.meetingGroup.text} - ${
+            curMeeting.meetingType.text
+          }`,
+        };
       });
       if (!this.showPrevious) {
         arr = arr.filter((meeting) => {
@@ -262,8 +266,14 @@ export default {
           return this.filters.indexOf(meeting.meetingGroup.value) !== -1;
         });
       }
-      arr = _.orderBy(arr, this.orderBy.value, this.orderBy.direction);
-      return arr;
+
+      const sortBy = (key, direction) => {
+        var dir = direction == "asc" ? -1 : 1;
+        return (a, b) =>
+          a[key] > b[key] ? 1 * dir : b[key] > a[key] ? -1 * dir : 0;
+      };
+
+      return arr.sort(sortBy(this.orderBy.value, this.orderBy.direction));
     },
   },
   filters: {
