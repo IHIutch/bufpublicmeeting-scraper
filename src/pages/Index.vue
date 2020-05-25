@@ -137,7 +137,7 @@
           <div class="flex mb-3">
             <div>
               <span class="text-muted font-weight-bold">
-                {{ meeting.date | moment }}
+                {{ meeting.date | dayjs }}
               </span>
             </div>
           </div>
@@ -190,19 +190,19 @@ query {
 
 <script>
 import MeetingsData from "@/data/meetings.json";
-import moment from "moment";
+import dayjs from "dayjs";
 import _ from "lodash";
 
 export default {
   name: "Index",
   metaInfo: {
-    title: "Hello, world!"
+    title: "Hello, world!",
   },
   data() {
     return {
       filters: [],
       showPrevious: false,
-      orderBy: {}
+      orderBy: {},
     };
   },
   created() {
@@ -210,7 +210,7 @@ export default {
     this.orderBy = this.$route.query.orderBy
       ? {
           value: this.$route.query.orderBy[0],
-          direction: this.$route.query.orderBy[1]
+          direction: this.$route.query.orderBy[1],
         }
       : { value: "date", direction: "asc" };
     this.filters = this.$route.query.filters ? this.$route.query.filters : [];
@@ -227,20 +227,20 @@ export default {
       query["showPrevious"] = this.showPrevious ? true : undefined;
 
       this.$router.replace({
-        query: query
+        query: query,
       });
-    }
+    },
   },
   computed: {
     filterGroups() {
       let obj = {};
-      this.$page.allMeeting.edges.forEach(meeting => {
+      this.$page.allMeeting.edges.forEach((meeting) => {
         meeting = meeting.node;
         let groupIdx = meeting.meetingGroup.value;
         if (!Object.keys(obj).includes(groupIdx)) {
           obj[groupIdx] = {
             text: meeting.meetingGroup.text,
-            values: []
+            values: [],
           };
         }
         obj[groupIdx].values.push(meeting);
@@ -249,27 +249,27 @@ export default {
     },
     filteredMeetings() {
       let arr = [];
-      this.$page.allMeeting.edges.forEach(meeting => {
+      this.$page.allMeeting.edges.forEach((meeting) => {
         arr.push(meeting.node);
       });
       if (!this.showPrevious) {
-        arr = arr.filter(meeting => {
-          return moment() < moment(meeting.date);
+        arr = arr.filter((meeting) => {
+          return dayjs() < dayjs(meeting.date);
         });
       }
       if (this.filters.length > 0) {
-        arr = arr.filter(meeting => {
+        arr = arr.filter((meeting) => {
           return this.filters.indexOf(meeting.meetingGroup.value) !== -1;
         });
       }
       arr = _.orderBy(arr, this.orderBy.value, this.orderBy.direction);
       return arr;
-    }
+    },
   },
   filters: {
-    moment(value) {
-      return moment(value).format("MMMM D, YYYY - h:mmA");
-    }
-  }
+    dayjs(value) {
+      return dayjs(value).format("MMMM D, YYYY - h:mmA");
+    },
+  },
 };
 </script>

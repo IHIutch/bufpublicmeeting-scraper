@@ -8,8 +8,8 @@
     "explore": "gridsome explore"
   },
   "dependencies": {
-    "gridsome": "^0.7.14",
-    "moment": "^2.26.0"
+    "dayjs": "^1.8.27",
+    "gridsome": "^0.7.14"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^1.3.0",
