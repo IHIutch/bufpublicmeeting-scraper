@@ -16,27 +16,12 @@
                   class="mr-2"
                   type="radio"
                   name="sorting"
-                  :value="{ value: 'date', direction: 'asc' }"
-                  v-model="orderBy"
-                  @change="updateRouteQuery()"
-                />
-                <span>Meeting Date (Asc)</span></label
-              >
-            </div>
-            <div>
-              <label
-                class="cursor-pointer hover:underline flex items-center py-1"
-              >
-                <input
-                  class="mr-2"
-                  type="radio"
-                  name="sorting"
                   :value="{ value: 'date', direction: 'desc' }"
                   v-model="orderBy"
                   @change="updateRouteQuery()"
                 />
-                <span>Meeting Date (Desc)</span></label
-              >
+                <span>Meeting Date (Desc)</span>
+              </label>
             </div>
             <div>
               <label
@@ -46,12 +31,12 @@
                   class="mr-2"
                   type="radio"
                   name="sorting"
-                  :value="{ value: 'title', direction: 'asc' }"
+                  :value="{ value: 'date', direction: 'asc' }"
                   v-model="orderBy"
                   @change="updateRouteQuery()"
                 />
-                <span>Meeting Name (Asc)</span></label
-              >
+                <span>Meeting Date (Asc)</span>
+              </label>
             </div>
             <div>
               <label
@@ -65,8 +50,23 @@
                   v-model="orderBy"
                   @change="updateRouteQuery()"
                 />
-                <span>Meeting Name (Desc)</span></label
+                <span>Meeting Name (Desc)</span>
+              </label>
+            </div>
+            <div>
+              <label
+                class="cursor-pointer hover:underline flex items-center py-1"
               >
+                <input
+                  class="mr-2"
+                  type="radio"
+                  name="sorting"
+                  :value="{ value: 'title', direction: 'asc' }"
+                  v-model="orderBy"
+                  @change="updateRouteQuery()"
+                />
+                <span>Meeting Name (Asc)</span>
+              </label>
             </div>
           </fieldset>
         </div>
@@ -123,7 +123,7 @@
         </div>
       </div>
     </aside>
-    <main class="w-3/4 ml-auto px-3">
+    <main role="main" class="w-3/4 ml-auto px-3">
       <div v-for="meeting in filteredMeetings" :key="meeting.meetingId">
         <div class="border rounded p-4 mb-4">
           <div class="flex">
@@ -190,7 +190,6 @@ query {
 <script>
 import MeetingsData from "@/data/meetings.json";
 import dayjs from "dayjs";
-import _ from "lodash";
 
 export default {
   name: "Index",
@@ -211,7 +210,7 @@ export default {
           value: this.$route.query.orderBy[0],
           direction: this.$route.query.orderBy[1],
         }
-      : { value: "date", direction: "asc" };
+      : { value: "date", direction: "desc" };
     this.filters = this.$route.query.filters ? this.$route.query.filters : [];
   },
   methods: {
