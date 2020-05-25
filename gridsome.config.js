@@ -12,7 +12,8 @@ const postcssPlugins = [tailwind, autoprefixer];
 if (process.env.NODE_ENV === "production") postcssPlugins.push(purgecss());
 
 module.exports = {
-  siteName: "Gridsome",
+  siteName: "BufPublicMeetings",
+  siteUrl: "http://openmeetings.jbhutch.com",
   templates: {
     Meeting: [
       {
