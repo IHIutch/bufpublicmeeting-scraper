@@ -39,26 +39,24 @@
 </page-query>
 
 <script>
-import dayjs from "dayjs";
+import dayjs from 'dayjs'
 
 export default {
-  name: "MeetingTemplate",
+  name: 'MeetingTemplate',
   metaInfo() {
     return {
       title: this.title,
-    };
-  },
-  computed: {
-    title() {
-      return `${this.$page.meeting.meetingGroup.text} - ${
-        this.$page.meeting.meetingType.text
-      }`;
-    },
+    }
   },
   filters: {
     dayjs(value) {
-      return dayjs(value).format("MMMM D, YYYY - h:mmA");
+      return dayjs(value).format('MMMM D, YYYY - h:mmA')
     },
   },
-};
+  computed: {
+    title() {
+      return `${this.$page.meeting.meetingGroup.text} - ${this.$page.meeting.meetingType.text}`
+    },
+  },
+}
 </script>

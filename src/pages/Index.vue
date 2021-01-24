@@ -2,9 +2,7 @@
   <Layout>
     <aside class="w-1/4 sticky top-0 h-screen overflow-y-scroll px-3">
       <div class="my-5">
-        <h2 class="font-medium text-2xl mb-2">
-          Sorting &amp; Filters
-        </h2>
+        <h2 class="font-medium text-2xl mb-2">Sorting &amp; Filters</h2>
         <div class="border rounded p-3 mb-4">
           <fieldset>
             <legend class="font-medium text-xl">Sort by:</legend>
@@ -13,11 +11,11 @@
                 class="cursor-pointer hover:underline flex items-center py-1"
               >
                 <input
+                  v-model="orderBy"
                   class="mr-2"
                   type="radio"
                   name="sorting"
                   :value="{ value: 'date', direction: 'desc' }"
-                  v-model="orderBy"
                   @change="updateRouteQuery()"
                 />
                 <span>Meeting Date (Desc)</span>
@@ -28,11 +26,11 @@
                 class="cursor-pointer hover:underline flex items-center py-1"
               >
                 <input
+                  v-model="orderBy"
                   class="mr-2"
                   type="radio"
                   name="sorting"
                   :value="{ value: 'date', direction: 'asc' }"
-                  v-model="orderBy"
                   @change="updateRouteQuery()"
                 />
                 <span>Meeting Date (Asc)</span>
@@ -43,11 +41,11 @@
                 class="cursor-pointer hover:underline flex items-center py-1"
               >
                 <input
+                  v-model="orderBy"
                   class="mr-2"
                   type="radio"
                   name="sorting"
                   :value="{ value: 'title', direction: 'desc' }"
-                  v-model="orderBy"
                   @change="updateRouteQuery()"
                 />
                 <span>Meeting Name (Desc)</span>
@@ -58,11 +56,11 @@
                 class="cursor-pointer hover:underline flex items-center py-1"
               >
                 <input
+                  v-model="orderBy"
                   class="mr-2"
                   type="radio"
                   name="sorting"
                   :value="{ value: 'title', direction: 'asc' }"
-                  v-model="orderBy"
                   @change="updateRouteQuery()"
                 />
                 <span>Meeting Name (Asc)</span>
@@ -76,12 +74,12 @@
             class="cursor-pointer hover:underline flex items-center py-1"
           >
             <input
+              id="showPrevious"
+              v-model="showPrevious"
               class="mr-2 cursor-pointer"
               type="checkbox"
               name="showPrevious"
-              id="showPrevious"
               :value="true"
-              v-model="showPrevious"
               @change="updateRouteQuery()"
             /><span>Show Past Meetings</span>
           </label>
@@ -102,12 +100,12 @@
                 class="cursor-pointer hover:underline flex items-center py-1"
               >
                 <input
+                  :id="index"
+                  v-model="filters"
                   class="mr-2 cursor-pointer"
                   type="checkbox"
                   name="filtering"
-                  :id="index"
                   :value="index"
-                  v-model="filters"
                   @change="updateRouteQuery()"
                 />
                 <div>
@@ -142,7 +140,7 @@
           </div>
           <div class="mb-4">
             <div class="flex -mx-4">
-              <div class="px-4" v-for="(link, idx) in meeting.links" :key="idx">
+              <div v-for="(link, idx) in meeting.links" :key="idx" class="px-4">
                 <a
                   :href="link.linkUrl"
                   class="text-teal-700 hover:text-teal-900 hover:underline"
@@ -170,11 +168,11 @@ query {
           linkText
         }
         meetingGroup{
-          text, 
+          text,
           value
         },
         meetingType{
-          text, 
+          text,
           value
         },
         date,
@@ -186,97 +184,94 @@ query {
 </page-query>
 
 <script>
-import MeetingsData from "@/data/meetings.json";
-import dayjs from "dayjs";
+import dayjs from 'dayjs'
 
 export default {
-  name: "Index",
+  name: 'Index',
   metaInfo: {
-    title: "Hello, world!",
+    title: 'Hello, world!',
+  },
+  filters: {
+    dayjs(value) {
+      return dayjs(value).format('MMMM D, YYYY - h:mmA')
+    },
   },
   data() {
     return {
       filters: [],
       showPrevious: false,
       orderBy: {},
-    };
+    }
+  },
+  computed: {
+    filterGroups() {
+      const obj = {}
+      this.$page.allMeeting.edges.forEach((meeting) => {
+        const curMeeting = meeting.node
+        const groupIdx = curMeeting.meetingGroup.value
+        if (!Object.keys(obj).includes(groupIdx)) {
+          obj[groupIdx] = {
+            text: curMeeting.meetingGroup.text,
+            values: [],
+          }
+        }
+        obj[groupIdx].values.push(meeting)
+      })
+      return obj
+    },
+    filteredMeetings() {
+      let arr = this.$page.allMeeting.edges.map((meeting) => {
+        const curMeeting = meeting.node
+        return {
+          ...curMeeting,
+          title: `${curMeeting.meetingGroup.text} - ${curMeeting.meetingType.text}`,
+        }
+      })
+      if (!this.showPrevious) {
+        arr = arr.filter((meeting) => {
+          return dayjs() < dayjs(meeting.date)
+        })
+      }
+      if (this.filters.length > 0) {
+        arr = arr.filter((meeting) => {
+          return this.filters.includes(meeting.meetingGroup.value)
+        })
+      }
+
+      const sortBy = (key, direction) => {
+        const dir = direction === 'asc' ? -1 : 1
+        return (a, b) =>
+          a[key] > b[key] ? 1 * dir : b[key] > a[key] ? -1 * dir : 0
+      }
+
+      return arr.sort(sortBy(this.orderBy.value, this.orderBy.direction))
+    },
   },
   created() {
-    this.showPrevious = this.$route.query.showPrevious ? true : false;
+    this.showPrevious = !!this.$route.query.showPrevious
     this.orderBy = this.$route.query.orderBy
       ? {
           value: this.$route.query.orderBy[0],
           direction: this.$route.query.orderBy[1],
         }
-      : { value: "date", direction: "desc" };
-    this.filters = this.$route.query.filters ? this.$route.query.filters : [];
+      : { value: 'date', direction: 'desc' }
+    this.filters = this.$route.query.filters ? this.$route.query.filters : []
   },
   methods: {
     clearFilters() {
-      this.filters = [];
-      this.updateRouteQuery();
+      this.filters = []
+      this.updateRouteQuery()
     },
     updateRouteQuery() {
-      var query = {};
-      query["filters"] = this.filters.length ? this.filters : undefined;
-      query["orderBy"] = [this.orderBy.value, this.orderBy.direction];
-      query["showPrevious"] = this.showPrevious ? true : undefined;
+      const query = {}
+      query.filters = this.filters.length ? this.filters : undefined
+      query.orderBy = [this.orderBy.value, this.orderBy.direction]
+      query.showPrevious = this.showPrevious ? true : undefined
 
       this.$router.replace({
-        query: query,
-      });
+        query,
+      })
     },
   },
-  computed: {
-    filterGroups() {
-      let obj = {};
-      this.$page.allMeeting.edges.forEach((meeting) => {
-        let curMeeting = meeting.node;
-        let groupIdx = curMeeting.meetingGroup.value;
-        if (!Object.keys(obj).includes(groupIdx)) {
-          obj[groupIdx] = {
-            text: curMeeting.meetingGroup.text,
-            values: [],
-          };
-        }
-        obj[groupIdx].values.push(meeting);
-      });
-      return obj;
-    },
-    filteredMeetings() {
-      let arr = this.$page.allMeeting.edges.map((meeting) => {
-        let curMeeting = meeting.node;
-        return {
-          ...curMeeting,
-          title: `${curMeeting.meetingGroup.text} - ${
-            curMeeting.meetingType.text
-          }`,
-        };
-      });
-      if (!this.showPrevious) {
-        arr = arr.filter((meeting) => {
-          return dayjs() < dayjs(meeting.date);
-        });
-      }
-      if (this.filters.length > 0) {
-        arr = arr.filter((meeting) => {
-          return this.filters.indexOf(meeting.meetingGroup.value) !== -1;
-        });
-      }
-
-      const sortBy = (key, direction) => {
-        var dir = direction == "asc" ? -1 : 1;
-        return (a, b) =>
-          a[key] > b[key] ? 1 * dir : b[key] > a[key] ? -1 * dir : 0;
-      };
-
-      return arr.sort(sortBy(this.orderBy.value, this.orderBy.direction));
-    },
-  },
-  filters: {
-    dayjs(value) {
-      return dayjs(value).format("MMMM D, YYYY - h:mmA");
-    },
-  },
-};
+}
 </script>
