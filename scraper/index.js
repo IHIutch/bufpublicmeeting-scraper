@@ -2,15 +2,61 @@ const fs = require('fs')
 const puppeteer = require('puppeteer')
 
 ;(async () => {
-  const url =
-    'http://buffalony.iqm2.com/Citizens/Calendar.aspx?From=1/1/2021&To=12/31/2021'
+  const getInnerPageData = (path) =>
+    new Promise((resolve, reject) => {
+      try {
+        ;(async () => {
+          const newPage = await browser.newPage()
+          await newPage.goto(path)
+
+          // Debug
+          newPage.on('console', (msg) => {
+            for (let i = 0; i < msg._args.length; ++i)
+              console.log(`${i}: ${msg._args[i]}`)
+          })
+
+          if (!(await newPage.$('table#MeetingDetail'))) resolve([])
+
+          const internalLinks =
+            (await newPage.$$eval(
+              'table#MeetingDetail tr td.Title a',
+              (rows) => {
+                return rows.map((el) => {
+                  // console.log(el.innerHTML)
+                  return {
+                    text: el.textContent,
+                    path: el.href,
+                  }
+                })
+              }
+            )) || null
+          resolve(internalLinks)
+          await newPage.close()
+        })()
+      } catch (err) {
+        reject(err)
+      }
+    })
+
   const browser = await puppeteer.launch({
-    // headless: false,
+    headless: false,
   })
   const page = await browser.newPage()
+  const url =
+    'http://buffalony.iqm2.com/Citizens/Calendar.aspx?From=1/1/2021&To=12/31/2021'
 
   await page.goto(url)
-  await page.waitForSelector('#ContentPlaceholder1_pnlMeetings')
+  try {
+    await page.waitForSelector('#ContentPlaceholder1_pnlMeetings')
+  } catch (err) {
+    console.log(err)
+  }
+
+  // Debug
+  page.on('console', (msg) => {
+    for (let i = 0; i < msg._args.length; ++i)
+      console.log(`${i}: ${msg._args[i]}`)
+  })
 
   const meetings = await page.$$eval('.Row.MeetingRow', (meeting) => {
     return meeting.map((el) => {
@@ -44,6 +90,11 @@ const puppeteer = require('puppeteer')
       }
     })
   })
+
+  for (const idx in meetings) {
+    // console.log(idx)
+    meetings[idx].internalLinks = await getInnerPageData(meetings[idx].path)
+  }
 
   // Save extracted items to a file.
   await fs.writeFile(
