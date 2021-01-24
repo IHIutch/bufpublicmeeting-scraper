@@ -2,13 +2,13 @@
   "name": "bufpublicmeetings",
   "private": true,
   "scripts": {
-    "scrape": "scrapy runspider scraper.py --loglevel=DEBUG -t json -o - > src/data/meetings.json",
     "build": "gridsome build",
     "develop": "gridsome develop",
     "explore": "gridsome explore",
     "lint:js": "eslint --ext .js,.vue --ignore-path .gitignore . --fix",
     "lint:style": "stylelint **/*.{vue,css} --ignore-path .gitignore",
-    "lint": "yarn lint:js && yarn lint:style"
+    "lint": "yarn lint:js && yarn lint:style",
+    "scrape": "node scraper --trace-warnings"
   },
   "dependencies": {
     "@gridsome/plugin-sitemap": "^0.4.0",
@@ -17,6 +17,7 @@
     "dayjs": "^1.8.27",
     "gridsome": "^0.7.14",
     "postcss": "^7",
+    "puppeteer": "^5.5.0",
     "sass": "^1.30.0",
     "sass-loader": "^10.1.1",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat"
