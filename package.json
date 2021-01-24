@@ -12,13 +12,14 @@
   },
   "dependencies": {
     "@gridsome/plugin-sitemap": "^0.4.0",
-    "autoprefixer": "^10.2.3",
+    "@tailwindcss/postcss7-compat": "^2.0.2",
+    "autoprefixer": "^9",
     "dayjs": "^1.8.27",
     "gridsome": "^0.7.14",
-    "postcss": "^8.2.4",
+    "postcss": "^7",
     "sass": "^1.30.0",
     "sass-loader": "^10.1.1",
-    "tailwindcss": "^2.0.2"
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^5.0.0",
