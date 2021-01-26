@@ -31,4 +31,4 @@ jobs:
           git add ./data/meetings.json
           timestamp=$(date -u +"%m-%d-%y")
           git commit -m "Update Data: ${timestamp}" || exit 0
-          git push
+          git push -u origin data-update
