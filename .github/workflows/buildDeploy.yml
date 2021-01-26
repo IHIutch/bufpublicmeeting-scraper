@@ -2,11 +2,6 @@
 name: Build & Deploy
 
 on:
-  workflow_run:
-      workflows: ["Scrape Data"]
-      types:
-        - completed
-
   push:
     branches:
       - master
@@ -14,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  job1:
     name: Build & Deploy
     runs-on: ubuntu-latest
 
