@@ -7,3 +7,4 @@ dist
 .env
 .env.*
 scraper.pyc
+__pycache__
