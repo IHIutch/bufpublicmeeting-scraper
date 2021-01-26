@@ -3,6 +3,8 @@ name: Scrape & Rebuild
 on:
   schedule:
     - cron:  '0 8 * * *'
+      
+  workflow_dispatch:
 
 jobs:
     # Job named "scrape"
