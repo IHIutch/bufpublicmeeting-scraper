@@ -21,7 +21,7 @@ jobs:
         run: pip install scrapy
 
       - name: Fetch latest data
-        run: scrapy runspider scraper/spiders/meetingScraper.py --nolog -o - > ./data/meetings.json
+        run: scrapy runspider scraper/spiders/meetingScraper.py --nolog -t json -o - > ./data/meetings.json
 
       - name: Commit and push if it changed
         run: |
