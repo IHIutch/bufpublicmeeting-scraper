@@ -7,7 +7,7 @@
 
 module.exports = function (api) {
   api.loadSource((actions) => {
-    const MeetingsData = require('./src/data/meetings.json')
+    const MeetingsData = require('./data/meetings.json')
 
     const contentType = actions.addCollection({
       typeName: 'Meeting',
