@@ -28,7 +28,7 @@ jobs:
           git config user.name "🤖 Automated"
           git config user.email "actions@users.noreply.github.com"
           git checkout --orphan data-update
-          git rm -rf .
+          git rm -r .
           git add -A
           timestamp=$(date -u +"%m-%d-%y")
           git commit -m "Update Data: ${timestamp}" || exit 0
