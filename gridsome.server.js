@@ -6,13 +6,14 @@
 // To restart press CTRL + C in terminal and run `gridsome develop`
 const axios = require('axios')
 
+const apiURL =
+  'https://raw.githubusercontent.com/IHIutch/bufpublicmeeting-scraper/data/index.json'
+
 module.exports = function (api) {
   api.loadSource(async (actions) => {
     // const MeetingsData = require('./data/meetings.json')
     const getData = async () => {
-      const res = await axios(
-        'https://raw.githubusercontent.com/IHIutch/bufpublicmeeting-scraper/master/data/index.json'
-      )
+      const res = await axios(apiURL)
       return await res.data
     }
 
