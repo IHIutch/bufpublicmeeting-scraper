@@ -1,5 +1,5 @@
 
-name: Build & Deploy to GitHub Pages
+name: Build & Deploy
 
 on:
   workflow_run:
@@ -35,3 +35,4 @@ jobs:
           FOLDER: dist
           COMMIT_MESSAGE: "Deploy to gh-pages"
           CLEAN: true
+          SINGLE_COMMIT: true
