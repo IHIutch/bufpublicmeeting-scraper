@@ -3,7 +3,7 @@ name: Scrape & Rebuild
 on:
   schedule:
     - cron:  '0 8 * * *'
-      
+
   workflow_dispatch:
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
 
       - name: Fetch latest data
         run: |-
-          scrapy runspider scraper/spiders/meetingScraper.py -o ./data/meetings.json
+          scrapy runspider scraper/spiders/meetingScraper.py --nolog -o - > ./data/meetings.json
 
       - name: Commit and push if it changed
         run: |-
