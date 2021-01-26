@@ -1,4 +1,4 @@
-name: Scrape & Rebuild
+name: Scrape Data
 
 on:
   schedule:
