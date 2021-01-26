@@ -204,14 +204,16 @@ export default {
     }
   },
   computed: {
+    meetings() {
+      return this.$page.allMeeting.edges.map((meeting) => meeting.node)
+    },
     filterGroups() {
       const obj = {}
-      this.$page.allMeeting.edges.forEach((meeting) => {
-        const curMeeting = meeting.node
-        const groupIdx = curMeeting.meetingGroup.value
+      this.meetings.forEach((meeting) => {
+        const groupIdx = meeting.meetingGroup.value
         if (!Object.keys(obj).includes(groupIdx)) {
           obj[groupIdx] = {
-            text: curMeeting.meetingGroup.text,
+            text: meeting.meetingGroup.text,
             values: [],
           }
         }
@@ -220,11 +222,10 @@ export default {
       return obj
     },
     filteredMeetings() {
-      let arr = this.$page.allMeeting.edges.map((meeting) => {
-        const curMeeting = meeting.node
+      let arr = this.meetings.map((meeting) => {
         return {
-          ...curMeeting,
-          title: `${curMeeting.meetingGroup.text} - ${curMeeting.meetingType.text}`,
+          ...meeting,
+          title: `${meeting.meetingGroup.text} - ${meeting.meetingType.text}`,
         }
       })
       if (!this.showPrevious) {

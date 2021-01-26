@@ -6,7 +6,7 @@ class MeetingsSpider(scrapy.Spider):
 
     name = "meetings"
     start_urls = [
-        'http://buffalony.iqm2.com/Citizens/Calendar.aspx?From=1/1/2019&To=12/31/2020'
+        'http://buffalony.iqm2.com/Citizens/Calendar.aspx?From=1/1/2021&To=12/31/2021'
     ]
 
     id = ''
