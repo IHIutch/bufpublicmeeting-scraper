@@ -4,16 +4,25 @@
 
 // Changes here require a server restart.
 // To restart press CTRL + C in terminal and run `gridsome develop`
+const axios = require('axios')
 
 module.exports = function (api) {
-  api.loadSource((actions) => {
-    const MeetingsData = require('./data/meetings.json')
+  api.loadSource(async (actions) => {
+    // const MeetingsData = require('./data/meetings.json')
+    const getData = async () => {
+      const res = await axios(
+        'https://raw.githubusercontent.com/IHIutch/bufpublicmeeting-scraper/master/data/index.json'
+      )
+      return await res.data
+    }
+
+    const meetingData = await getData()
 
     const contentType = actions.addCollection({
       typeName: 'Meeting',
     })
 
-    MeetingsData.forEach((meeting) => {
+    meetingData.forEach((meeting) => {
       const key = Object.keys(meeting)[0]
 
       const groupUrlify = meeting[key].meetingGroup
