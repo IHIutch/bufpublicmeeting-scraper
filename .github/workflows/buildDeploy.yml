@@ -2,6 +2,11 @@
 name: Build & Deploy to GitHub Pages
 
 on:
+  workflow_run:
+      workflows: ["Scrape Data"]
+      types:
+        - completed
+
   push:
     branches:
       - master
