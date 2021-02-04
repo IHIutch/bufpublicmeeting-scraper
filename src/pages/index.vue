@@ -111,7 +111,7 @@
                 <div>
                   <span class="mr-2">{{ group.text }}</span>
                   <span
-                    class="text-white bg-blue-500 p-1 rounded-full text-xs font-medium"
+                    class="px-2 inline-block text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
                     >{{ group.values.length }}
                   </span>
                 </div>

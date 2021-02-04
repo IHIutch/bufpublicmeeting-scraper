@@ -13,7 +13,6 @@ class MeetingsSpider(scrapy.Spider):
 
     def parse_meeting(self, response):
         obj = response.meta['obj']
-        meetingId = response.meta['meetingId']
 
         obj['internalLinks'] = []
         for download in response.css('table#MeetingDetail td.Title'):
@@ -28,14 +27,7 @@ class MeetingsSpider(scrapy.Spider):
                 })
                 count += 1
 
-        yield {
-            meetingId: obj
-        }
-
-    # self.obj[self.id]['minutes'] = {
-    #     'linkText': response.css('a.Link::attr(href)')
-    #     'linkUrl': response.css('a.Link::text')
-    # }
+        yield obj
 
     def parse(self, response):
 
@@ -77,14 +69,8 @@ class MeetingsSpider(scrapy.Spider):
                 })
                 count += 1
 
-                # obj[self.id]['links'].append(temp)
-
             if meetingLink is not None:
                 yield response.follow(
-                    meetingLink, callback=self.parse_meeting, meta={'obj': obj, 'meetingId': self.id})
-
-            # yield {
-            #     self.id: obj
-            # }
+                    meetingLink, callback=self.parse_meeting, meta={'obj': obj})
 
 # Run with `scrapy runspider scraper.py -t json -o - > src/data/meetings.json` in the terminal

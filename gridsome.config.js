@@ -13,7 +13,7 @@ module.exports = {
   templates: {
     Meeting: [
       {
-        path: '/:meetingGroupUrlify/:meetingTypeUrlify/:meetingId',
+        path: '/:groupUrlify/:typeUrlify/:meetingId',
         component: './src/templates/MeetingTemplate.vue',
       },
     ],

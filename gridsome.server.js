@@ -6,52 +6,48 @@
 // To restart press CTRL + C in terminal and run `gridsome develop`
 const axios = require('axios')
 
-const apiURL =
-  'https://raw.githubusercontent.com/IHIutch/bufpublicmeeting-scraper/data/index.json'
+const getData = async () => {
+  const res = await axios(
+    'https://raw.githubusercontent.com/IHIutch/bufpublicmeeting-scraper/data/index.json'
+  )
+  return await res.data
+}
+
+const urlify = (string) => {
+  return string.split(' ').join('-').toLowerCase()
+}
 
 module.exports = function (api) {
   api.loadSource(async (actions) => {
-    // const MeetingsData = require('./data/meetings.json')
-    const getData = async () => {
-      const res = await axios(apiURL)
-      return await res.data
-    }
-
     const meetingData = await getData()
+    // const meetingData = require('./data/index.json')
 
     const contentType = actions.addCollection({
       typeName: 'Meeting',
     })
 
     meetingData.forEach((meeting) => {
-      const key = Object.keys(meeting)[0]
+      const typeUrlify = urlify(meeting.meetingType)
+      const groupUrlify = urlify(meeting.meetingGroup)
 
-      const groupUrlify = meeting[key].meetingGroup
-        .split(' ')
-        .join('-')
-        .toLowerCase()
-
-      const typeUrlify = meeting[key].meetingType
-        .split(' ')
-        .join('-')
-        .toLowerCase()
-
-      meeting[key].id = meeting[key].meetingId
-      meeting[key].meetingGroupUrlify = groupUrlify
-      meeting[key].meetingGroup = {
-        value: groupUrlify,
-        text: meeting[key].meetingGroup,
+      const meetingObj = {
+        ...meeting,
+        groupUrlify,
+        typeUrlify,
+        id: meeting.meetingId,
+        meetingGroup: {
+          value: groupUrlify,
+          text: meeting.meetingGroup,
+        },
+        meetingType: {
+          value: typeUrlify,
+          text: meeting.meetingType,
+        },
+        date: new Date(meeting.date),
+        path: groupUrlify + '/' + typeUrlify + '/' + meeting.meetingId,
       }
-      meeting[key].meetingTypeUrlify = typeUrlify
-      meeting[key].meetingType = {
-        value: typeUrlify,
-        text: meeting[key].meetingType,
-      }
-      meeting[key].date = new Date(meeting[key].date)
-      meeting[key].path =
-        groupUrlify + '/' + typeUrlify + meeting[key].meetingId
 
-      contentType.addNode(meeting[key])
+      contentType.addNode(meetingObj)
     })
   })
 
