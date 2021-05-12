@@ -16,7 +16,7 @@
     "axios": "^0.21.1",
     "dayjs": "^1.8.27",
     "gridsome": "^0.7.14",
-    "postcss": "^7",
+    "postcss": "^8",
     "puppeteer": "^5.5.0",
     "sass": "^1.30.0",
     "sass-loader": "^10.1.1",
