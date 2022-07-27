@@ -9,14 +9,18 @@ import { CheckboxGroup } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import qs from 'qs'
 import { useMemo, useState } from 'react'
 
 export default function Home({ meetingData }) {
   const router = useRouter()
+  const query = router.query
 
-  const [meetingTypeFilter, setMeetingTypeFilter] = useState([])
-  const [meetingSort, setMeetingSort] = useState('date-desc')
+  console.log({ query })
+
+  const [meetingTypeFilter, setMeetingTypeFilter] = useState(
+    query?.filter || []
+  )
+  const [meetingSort, setMeetingSort] = useState(query?.sort || 'date-desc')
 
   const filteredMeetings = useMemo(() => {
     return meetingData.filter((m) => m)
@@ -38,10 +42,16 @@ export default function Home({ meetingData }) {
   }, [meetingData])
 
   const updateRouteQuery = (params) => {
-    const queryString = qs.stringify(params)
-    router.replace(`/?${queryString}`, undefined, {
-      shallow: true,
-    })
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: params,
+      },
+      undefined,
+      {
+        shallow: true,
+      }
+    )
   }
 
   const handleSetFilter = (values) => {
