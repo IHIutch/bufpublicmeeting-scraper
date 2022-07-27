@@ -8,18 +8,15 @@ import { Box } from '@chakra-ui/react'
 import { CheckboxGroup } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import qs from 'qs'
 import { useMemo, useState } from 'react'
 
 export default function Home({ meetingData }) {
-  const [filters, setFilters] = useState([])
+  const router = useRouter()
 
-  const clearFilters = () => {
-    console.log('clear filters')
-  }
-
-  const updateRouteQuery = (query) => {
-    console.log('update route query', query)
-  }
+  const [meetingTypeFilter, setMeetingTypeFilter] = useState([])
+  const [meetingSort, setMeetingSort] = useState('date-desc')
 
   const filteredMeetings = useMemo(() => {
     return meetingData.filter((m) => m)
@@ -40,7 +37,28 @@ export default function Home({ meetingData }) {
     return obj
   }, [meetingData])
 
-  console.log({ filteredMeetings, filterGroups })
+  const updateRouteQuery = (params) => {
+    const queryString = qs.stringify(params)
+    router.replace(`/?${queryString}`, undefined, {
+      shallow: true,
+    })
+  }
+
+  const handleSetFilter = (values) => {
+    setMeetingTypeFilter(values)
+    updateRouteQuery({
+      filter: values,
+      sort: meetingSort,
+    })
+  }
+
+  const handleSetSort = (value) => {
+    setMeetingSort(value)
+    updateRouteQuery({
+      filter: meetingTypeFilter,
+      sort: value,
+    })
+  }
 
   return (
     <Box maxW="container.xl" mx="auto" px="4" display="flex">
@@ -60,12 +78,12 @@ export default function Home({ meetingData }) {
               <Text as="legend" fontWeight="medium" fontSize="lg">
                 Sort by:
               </Text>
-              <RadioGroup>
+              <RadioGroup value={meetingSort} onChange={handleSetSort}>
                 <Stack>
-                  <Radio value="date-asc">Meeting Date (Desc)</Radio>
-                  <Radio value="date-desc">Meeting Date (Asc)</Radio>
-                  <Radio value="name-asc">Meeting Name (Desc)</Radio>
-                  <Radio value="name-desc">Meeting Name (Asc)</Radio>
+                  <Radio value="date-desc">Meeting Date (Desc)</Radio>
+                  <Radio value="date-asc">Meeting Date (Asc)</Radio>
+                  <Radio value="name-desc">Meeting Name (Desc)</Radio>
+                  <Radio value="name-asc">Meeting Name (Asc)</Radio>
                 </Stack>
               </RadioGroup>
             </fieldset>
@@ -85,24 +103,27 @@ export default function Home({ meetingData }) {
               <span>Show Past Meetings</span>
             </label>
           </div>
-          <Box rounded="md" borderWidth="1px">
+          <Box rounded="md" borderWidth="1px" p="3">
             <fieldset>
               <Box mb="2">
                 <Text as="legend" fontWeight="medium" fontSize="lg">
                   Filter Meeting Type:
                 </Text>
                 <Button
-                  onClick={clearFilters}
+                  onClick={() => handleSetFilter([])}
                   cursor="pointer"
                   variant="link"
                   colorScheme="blue"
-                  isDisabled={filters.length}
+                  isDisabled={!meetingTypeFilter.length}
                   size="sm"
                 >
                   Clear Filters
                 </Button>
               </Box>
-              <CheckboxGroup>
+              <CheckboxGroup
+                value={meetingTypeFilter}
+                onChange={handleSetFilter}
+              >
                 <Stack>
                   {Object.entries(filterGroups).map(([key, val], idx) => (
                     <Checkbox key={key} value={key}>
