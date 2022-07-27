@@ -1,3 +1,11 @@
+import { Checkbox } from '@chakra-ui/react'
+import { Stack } from '@chakra-ui/react'
+import { Button } from '@chakra-ui/react'
+import { RadioGroup } from '@chakra-ui/react'
+import { Text } from '@chakra-ui/react'
+import { Radio } from '@chakra-ui/react'
+import { Box } from '@chakra-ui/react'
+import { CheckboxGroup } from '@chakra-ui/react'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
@@ -35,59 +43,33 @@ export default function Home({ meetingData }) {
   console.log({ filteredMeetings, filterGroups })
 
   return (
-    <div className="container mx-auto px-4 flex">
-      <aside className="w-1/4 sticky top-0 h-screen overflow-y-scroll px-3">
+    <Box maxW="container.xl" mx="auto" px="4" display="flex">
+      <Box
+        as="aside"
+        w={1 / 4}
+        position="sticky"
+        top="0"
+        h="full"
+        overflow="auto"
+        px="3"
+      >
         <div className="my-5">
           <h2 className="font-medium text-2xl mb-2">Sorting &amp; Filters</h2>
-          <div className="border rounded p-3 mb-4">
+          <Box borderWidth="1px" rounded="md" p="3" mb="4">
             <fieldset>
-              <legend className="font-medium text-xl">Sort by:</legend>
-              <div>
-                <label className="cursor-pointer hover:underline flex items-center py-1">
-                  <input
-                    className="mr-2"
-                    type="radio"
-                    name="sorting"
-                    onChange={(e) => updateRouteQuery(e.target.value)}
-                  />
-                  <span>Meeting Date (Desc)</span>
-                </label>
-              </div>
-              <div>
-                <label className="cursor-pointer hover:underline flex items-center py-1">
-                  <input
-                    className="mr-2"
-                    type="radio"
-                    name="sorting"
-                    onChange={(e) => updateRouteQuery(e.target.value)}
-                  />
-                  <span>Meeting Date (Asc)</span>
-                </label>
-              </div>
-              <div>
-                <label className="cursor-pointer hover:underline flex items-center py-1">
-                  <input
-                    className="mr-2"
-                    type="radio"
-                    name="sorting"
-                    onChange={(e) => updateRouteQuery(e.target.value)}
-                  />
-                  <span>Meeting Name (Desc)</span>
-                </label>
-              </div>
-              <div>
-                <label className="cursor-pointer hover:underline flex items-center py-1">
-                  <input
-                    className="mr-2"
-                    type="radio"
-                    name="sorting"
-                    onChange={(e) => updateRouteQuery(e.target.value)}
-                  />
-                  <span>Meeting Name (Asc)</span>
-                </label>
-              </div>
+              <Text as="legend" fontWeight="medium" fontSize="lg">
+                Sort by:
+              </Text>
+              <RadioGroup>
+                <Stack>
+                  <Radio value="date-asc">Meeting Date (Desc)</Radio>
+                  <Radio value="date-desc">Meeting Date (Asc)</Radio>
+                  <Radio value="name-asc">Meeting Name (Desc)</Radio>
+                  <Radio value="name-desc">Meeting Name (Asc)</Radio>
+                </Stack>
+              </RadioGroup>
             </fieldset>
-          </div>
+          </Box>
           <div className="border rounded p-3 mb-4">
             <label
               htmlFor="showPrevious"
@@ -103,41 +85,37 @@ export default function Home({ meetingData }) {
               <span>Show Past Meetings</span>
             </label>
           </div>
-          <div className="border rounded p-3">
+          <Box rounded="md" borderWidth="1px">
             <fieldset>
-              <legend className="font-medium text-xl">
-                Filter Meeting Type:
-              </legend>
-              <button
-                disabled={filters.length}
-                className="cursor-pointer hover:underline text-teal-700 focus:outline-none"
-                onClick={clearFilters}
-              >
-                Clear Filters
-              </button>
-              {Object.entries(filterGroups).map(([key, val], idx) => (
-                <div key={key}>
-                  <label className="cursor-pointer hover:underline flex items-center py-1">
-                    <input
-                      className="mr-2 cursor-pointer"
-                      type="checkbox"
-                      name="filtering"
-                      onChange={(e) => updateRouteQuery(e.target.value)}
-                    />
-                    <div>
-                      <span className="mr-2">{val.text}</span>
-                      <span className="px-2 inline-block text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {val.values.length}
-                      </span>
-                    </div>
-                  </label>
-                </div>
-              ))}
+              <Box mb="2">
+                <Text as="legend" fontWeight="medium" fontSize="lg">
+                  Filter Meeting Type:
+                </Text>
+                <Button
+                  onClick={clearFilters}
+                  cursor="pointer"
+                  variant="link"
+                  colorScheme="blue"
+                  isDisabled={filters.length}
+                  size="sm"
+                >
+                  Clear Filters
+                </Button>
+              </Box>
+              <CheckboxGroup>
+                <Stack>
+                  {Object.entries(filterGroups).map(([key, val], idx) => (
+                    <Checkbox key={key} value={key}>
+                      {val.text}
+                    </Checkbox>
+                  ))}
+                </Stack>
+              </CheckboxGroup>
             </fieldset>
-          </div>
+          </Box>
         </div>
-      </aside>
-      <main role="main" className="w-3/4 ml-auto px-3">
+      </Box>
+      <Box as="main" w={3 / 4} ml="auto" px="3">
         {filteredMeetings.map((meeting) => (
           <div key={meeting.meetingId}>
             <div className="border rounded p-4 mb-4">
@@ -173,8 +151,8 @@ export default function Home({ meetingData }) {
             </div>
           </div>
         ))}
-      </main>
-    </div>
+      </Box>
+    </Box>
   )
 }
 
