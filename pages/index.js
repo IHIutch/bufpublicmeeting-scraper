@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
@@ -177,7 +178,7 @@ export default function Home({ meetingData }) {
   )
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const urlify = (string) => {
     return string.split(' ').join('-').toLowerCase()
   }
@@ -187,28 +188,36 @@ export async function getStaticProps() {
   )
   const json = await res.json()
 
-  const meetingData = json.map((meeting) => {
-    const typeUrlify = urlify(meeting.meetingType)
-    const groupUrlify = urlify(meeting.meetingGroup)
+  const meetingData = json
+    .filter((m) => {
+      const meetingDate = dayjs(m.date)
+      return (
+        meetingDate.isAfter(dayjs().startOf('week')) &&
+        meetingDate.isBefore(dayjs().add(1, 'week'))
+      )
+    })
+    .map((meeting) => {
+      const typeUrlify = urlify(meeting.meetingType)
+      const groupUrlify = urlify(meeting.meetingGroup)
 
-    return {
-      ...meeting,
-      groupUrlify,
-      typeUrlify,
-      id: meeting.meetingId,
-      meetingGroup: {
-        value: groupUrlify,
-        text: meeting.meetingGroup,
-      },
-      meetingType: {
-        value: typeUrlify,
-        text: meeting.meetingType,
-      },
-      date: new Date(meeting.date).toDateString(),
-      path: groupUrlify + '/' + typeUrlify + '/' + meeting.meetingId,
-      title: `${meeting.meetingGroup} - ${meeting.meetingType}`,
-    }
-  })
+      return {
+        ...meeting,
+        groupUrlify,
+        typeUrlify,
+        id: meeting.meetingId,
+        meetingGroup: {
+          value: groupUrlify,
+          text: meeting.meetingGroup,
+        },
+        meetingType: {
+          value: typeUrlify,
+          text: meeting.meetingType,
+        },
+        date: new Date(meeting.date).toDateString(),
+        path: groupUrlify + '/' + typeUrlify + '/' + meeting.meetingId,
+        title: `${meeting.meetingGroup} - ${meeting.meetingType}`,
+      }
+    })
 
   return {
     props: {
