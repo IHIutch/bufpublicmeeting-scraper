@@ -6,40 +6,36 @@ import { Text } from '@chakra-ui/react'
 import { Radio } from '@chakra-ui/react'
 import { Box } from '@chakra-ui/react'
 import { CheckboxGroup } from '@chakra-ui/react'
-import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { getMeetings } from '../utils/fetch/meetings'
+import { useGetMeetings } from '../utils/react-query/meetings'
+import { dehydrate, QueryClient } from '@tanstack/react-query'
+import sortedUniqBy from 'lodash/sortedUniq'
+import slugify from 'slugify'
 
-export default function Home({ meetingData }) {
+export default function Home() {
   const router = useRouter()
   const query = router.query
 
-  console.log({ query })
+  const filterQuery = [].concat(query.filter || [])
 
-  const [meetingTypeFilter, setMeetingTypeFilter] = useState(
-    query?.filter || []
-  )
-  const [meetingSort, setMeetingSort] = useState(query?.sort || 'date-desc')
-
-  const filteredMeetings = useMemo(() => {
-    return meetingData.filter((m) => m)
-  }, [meetingData])
+  const { data: meetings } = useGetMeetings({
+    filter: filterQuery,
+    sort: query.sort || 'date-desc',
+    dateRange: query?.dateRange || [],
+  })
 
   const filterGroups = useMemo(() => {
-    const obj = {}
-    meetingData.forEach((meeting) => {
-      const groupIdx = meeting.meetingGroup.value
-      if (!Object.keys(obj).includes(groupIdx)) {
-        obj[groupIdx] = {
-          text: meeting.meetingGroup.text,
-          values: [],
-        }
-      }
-      obj[groupIdx].values.push(meeting)
-    })
-    return obj
-  }, [meetingData])
+    return sortedUniqBy(
+      (meetings || []).map((m) => ({
+        label: m.meetingGroup,
+        value: m.groupUrlify,
+      })),
+      (m) => m.value
+    )
+  }, [meetings])
 
   const updateRouteQuery = (params) => {
     router.replace(
@@ -55,17 +51,15 @@ export default function Home({ meetingData }) {
   }
 
   const handleSetFilter = (values) => {
-    setMeetingTypeFilter(values)
     updateRouteQuery({
       filter: values,
-      sort: meetingSort,
+      sort: query.sort || 'date-desc',
     })
   }
 
   const handleSetSort = (value) => {
-    setMeetingSort(value)
     updateRouteQuery({
-      filter: meetingTypeFilter,
+      filter: query.filter || [],
       sort: value,
     })
   }
@@ -88,7 +82,10 @@ export default function Home({ meetingData }) {
               <Text as="legend" fontWeight="medium" fontSize="lg">
                 Sort by:
               </Text>
-              <RadioGroup value={meetingSort} onChange={handleSetSort}>
+              <RadioGroup
+                value={query?.sort || 'date-desc'}
+                onChange={handleSetSort}
+              >
                 <Stack>
                   <Radio value="date-desc">Meeting Date (Desc)</Radio>
                   <Radio value="date-asc">Meeting Date (Asc)</Radio>
@@ -124,20 +121,17 @@ export default function Home({ meetingData }) {
                   cursor="pointer"
                   variant="link"
                   colorScheme="blue"
-                  isDisabled={!meetingTypeFilter.length}
+                  isDisabled={!filterQuery.length}
                   size="sm"
                 >
                   Clear Filters
                 </Button>
               </Box>
-              <CheckboxGroup
-                value={meetingTypeFilter}
-                onChange={handleSetFilter}
-              >
+              <CheckboxGroup value={filterQuery} onChange={handleSetFilter}>
                 <Stack>
-                  {Object.entries(filterGroups).map(([key, val], idx) => (
-                    <Checkbox key={key} value={key}>
-                      {val.text}
+                  {filterGroups.map((fg, idx) => (
+                    <Checkbox key={idx} value={fg.value}>
+                      {fg.label}
                     </Checkbox>
                   ))}
                 </Stack>
@@ -147,7 +141,7 @@ export default function Home({ meetingData }) {
         </div>
       </Box>
       <Box as="main" w={3 / 4} ml="auto" px="3">
-        {filteredMeetings.map((meeting) => (
+        {(meetings || []).map((meeting) => (
           <div key={meeting.meetingId}>
             <div className="border rounded p-4 mb-4">
               <div className="flex">
@@ -187,50 +181,28 @@ export default function Home({ meetingData }) {
   )
 }
 
-export async function getServerSideProps() {
-  const urlify = (string) => {
-    return string.split(' ').join('-').toLowerCase()
-  }
+export async function getServerSideProps({ query }) {
+  const queryClient = new QueryClient()
 
-  const res = await fetch(
-    'https://raw.githubusercontent.com/IHIutch/bufpublicmeeting-scraper/data/index.json'
+  const meetings = await getMeetings()
+  const initialData = meetings
+
+  await queryClient.prefetchQuery(
+    [
+      'meetings',
+      {
+        filter: query?.filter || [],
+        sort: query?.sort || 'date-desc',
+        dateRange: query?.dateRange || [],
+      },
+    ],
+    async () => meetings
   )
-  const json = await res.json()
-
-  const meetingData = json
-    .filter((m) => {
-      const meetingDate = dayjs(m.date)
-      return (
-        meetingDate.isAfter(dayjs().startOf('week')) &&
-        meetingDate.isBefore(dayjs().add(1, 'week'))
-      )
-    })
-    .map((meeting) => {
-      const typeUrlify = urlify(meeting.meetingType)
-      const groupUrlify = urlify(meeting.meetingGroup)
-
-      return {
-        ...meeting,
-        groupUrlify,
-        typeUrlify,
-        id: meeting.meetingId,
-        meetingGroup: {
-          value: groupUrlify,
-          text: meeting.meetingGroup,
-        },
-        meetingType: {
-          value: typeUrlify,
-          text: meeting.meetingType,
-        },
-        date: new Date(meeting.date).toDateString(),
-        path: groupUrlify + '/' + typeUrlify + '/' + meeting.meetingId,
-        title: `${meeting.meetingGroup} - ${meeting.meetingType}`,
-      }
-    })
 
   return {
     props: {
-      meetingData,
+      initialData,
+      dehydratedState: dehydrate(queryClient),
     },
   }
 }

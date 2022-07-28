@@ -1,4 +1,5 @@
 import React from 'react'
+import axios from 'redaxios'
 
 export default function meetingId({ date, internalLinks, details, title }) {
   return (
@@ -28,13 +29,12 @@ export async function getStaticPaths() {
   const urlify = (string) => {
     return string.split(' ').join('-').toLowerCase()
   }
-  const res = await fetch(
+  const { data } = await axios.get(
     'https://raw.githubusercontent.com/IHIutch/bufpublicmeeting-scraper/data/index.json'
   )
-  const json = await res.json()
 
   return {
-    paths: json.map((meeting) => {
+    paths: data.map((meeting) => {
       const typeUrlify = urlify(meeting.meetingType)
       const groupUrlify = urlify(meeting.meetingGroup)
       return {
@@ -52,16 +52,11 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const { meetingGroup, meetingType, meetingId } = params
 
-  const urlify = (string) => {
-    return string.split(' ').join('-').toLowerCase()
-  }
-
-  const res = await fetch(
+  const { data } = await axios.get(
     'https://raw.githubusercontent.com/IHIutch/bufpublicmeeting-scraper/data/index.json'
   )
-  const json = await res.json()
 
-  const meetingData = json.find((meeting) => meeting.meetingId === meetingId)
+  const meetingData = data.find((meeting) => meeting.meetingId === meetingId)
 
   return {
     props: {
