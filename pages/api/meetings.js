@@ -1,4 +1,5 @@
 import { getMeetings } from '../../utils/axios/meetings'
+import { handleFilterMeetings } from '../../utils/function'
 
 const handler = async (req, res) => {
   const { method, query } = req
@@ -7,7 +8,13 @@ const handler = async (req, res) => {
     // Get
     case 'GET':
       try {
-        const data = await getMeetings(query)
+        const meetings = await getMeetings()
+        const data = await handleFilterMeetings({
+          meetings,
+          params: query,
+        })
+
+        console.log()
         res.status(200).json(data)
       } catch (error) {
         res.status(400).json({ error: error.message })

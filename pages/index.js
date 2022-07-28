@@ -8,18 +8,20 @@ import { Box } from '@chakra-ui/react'
 import { CheckboxGroup } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
 import { getMeetings } from '../utils/axios/meetings'
 import { useGetMeetings } from '../utils/react-query/meetings'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
-import sortedUniqBy from 'lodash/sortedUniq'
+import groupBy from 'lodash/groupBy'
 import { Flex } from '@chakra-ui/react'
 import { Heading } from '@chakra-ui/react'
 import { Link } from '@chakra-ui/react'
 import { Center } from '@chakra-ui/react'
 import { Spinner } from '@chakra-ui/react'
+import { handleFilterMeetings } from '../utils/function'
+import slugify from 'slugify'
+import { Tag } from '@chakra-ui/react'
 
-export default function Home() {
+export default function Home({ filterGroups }) {
   const router = useRouter()
   const query = router.query
 
@@ -30,16 +32,6 @@ export default function Home() {
     sort: query.sort || 'date-desc',
     dateRange: query?.dateRange || [],
   })
-
-  const filterGroups = useMemo(() => {
-    return sortedUniqBy(
-      (meetings || []).map((m) => ({
-        label: m.meetingGroup,
-        value: m.groupUrlify,
-      })),
-      (m) => m.value
-    )
-  }, [meetings])
 
   const updateRouteQuery = (params) => {
     router.replace(
@@ -134,9 +126,17 @@ export default function Home() {
               <CheckboxGroup value={filterQuery} onChange={handleSetFilter}>
                 <Stack>
                   {filterGroups.map((fg, idx) => (
-                    <Checkbox key={idx} value={fg.value}>
-                      {fg.label}
-                    </Checkbox>
+                    <Flex key={idx} justify="space-between" align="center">
+                      <Checkbox value={fg.value}>{fg.label}</Checkbox>
+                      <Tag
+                        flexShrink="0"
+                        size="sm"
+                        colorScheme="blue"
+                        borderRadius="full"
+                      >
+                        {fg.count}
+                      </Tag>
+                    </Flex>
                   ))}
                 </Stack>
               </CheckboxGroup>
@@ -192,24 +192,34 @@ export default function Home() {
 export async function getServerSideProps({ query }) {
   const queryClient = new QueryClient()
 
-  const meetings = await getMeetings()
-  const initialData = meetings
+  const filterQuery = [].concat(query.filter || [])
+  const filterParams = {
+    filter: filterQuery,
+    sort: query.sort || 'date-desc',
+    dateRange: query?.dateRange || [],
+  }
 
-  await queryClient.prefetchQuery(
-    [
-      'meetings',
-      {
-        filter: query?.filter || [],
-        sort: query?.sort || 'date-desc',
-        dateRange: query?.dateRange || [],
-      },
-    ],
-    async () => meetings
-  )
+  const meetings = await getMeetings()
+  const filterGroups = Object.entries(groupBy(meetings, 'meetingGroup'))
+    .map(([key, value]) => ({
+      label: key,
+      value: slugify(key),
+      count: value.length,
+    }))
+    .sort((a, b) => a.value.localeCompare(b.value))
+
+  console.log(filterGroups)
+
+  const data = await handleFilterMeetings({
+    meetings,
+    params: filterParams,
+  })
+
+  await queryClient.prefetchQuery(['meetings', filterParams], async () => data)
 
   return {
     props: {
-      initialData,
+      filterGroups,
       dehydratedState: dehydrate(queryClient),
     },
   }
