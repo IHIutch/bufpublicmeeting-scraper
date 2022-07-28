@@ -1,5 +1,7 @@
 import React from 'react'
 import axios from 'redaxios'
+import slugify from 'slugify'
+import { getMeeting } from '../../../utils/axios/meetings'
 
 export default function meetingId({ date, internalLinks, details, title }) {
   return (
@@ -26,17 +28,14 @@ export default function meetingId({ date, internalLinks, details, title }) {
 }
 
 export async function getStaticPaths() {
-  const urlify = (string) => {
-    return string.split(' ').join('-').toLowerCase()
-  }
   const { data } = await axios.get(
     'https://raw.githubusercontent.com/IHIutch/bufpublicmeeting-scraper/data/index.json'
   )
 
   return {
     paths: data.map((meeting) => {
-      const typeUrlify = urlify(meeting.meetingType)
-      const groupUrlify = urlify(meeting.meetingGroup)
+      const typeUrlify = slugify(meeting.meetingType)
+      const groupUrlify = slugify(meeting.meetingGroup)
       return {
         params: {
           meetingGroup: groupUrlify,
@@ -52,18 +51,14 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const { meetingGroup, meetingType, meetingId } = params
 
-  const { data } = await axios.get(
-    'https://raw.githubusercontent.com/IHIutch/bufpublicmeeting-scraper/data/index.json'
-  )
-
-  const meetingData = data.find((meeting) => meeting.meetingId === meetingId)
+  const meetingData = await getMeeting(meetingId)
 
   return {
     props: {
       ...meetingData,
+      id: meetingData.meetingId,
       groupUrlify: meetingGroup,
       typeUrlify: meetingType,
-      id: meetingData.meetingId,
       meetingGroup: {
         value: meetingGroup,
         text: meetingData.meetingGroup,

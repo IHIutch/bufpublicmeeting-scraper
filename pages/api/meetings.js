@@ -1,4 +1,4 @@
-import { getMeetings } from '../../utils/fetch/meetings'
+import { getMeetings } from '../../utils/axios/meetings'
 
 const handler = async (req, res) => {
   const { method, query } = req
