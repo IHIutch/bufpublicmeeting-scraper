@@ -6,14 +6,18 @@ import { Text } from '@chakra-ui/react'
 import { Radio } from '@chakra-ui/react'
 import { Box } from '@chakra-ui/react'
 import { CheckboxGroup } from '@chakra-ui/react'
-import Link from 'next/link'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { getMeetings } from '../utils/fetch/meetings'
 import { useGetMeetings } from '../utils/react-query/meetings'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
 import sortedUniqBy from 'lodash/sortedUniq'
-import slugify from 'slugify'
+import { Flex } from '@chakra-ui/react'
+import { Heading } from '@chakra-ui/react'
+import { Link } from '@chakra-ui/react'
+import { Center } from '@chakra-ui/react'
+import { Spinner } from '@chakra-ui/react'
 
 export default function Home() {
   const router = useRouter()
@@ -21,7 +25,7 @@ export default function Home() {
 
   const filterQuery = [].concat(query.filter || [])
 
-  const { data: meetings } = useGetMeetings({
+  const { data: meetings, isLoading } = useGetMeetings({
     filter: filterQuery,
     sort: query.sort || 'date-desc',
     dateRange: query?.dateRange || [],
@@ -141,41 +145,45 @@ export default function Home() {
         </div>
       </Box>
       <Box as="main" w={3 / 4} ml="auto" px="3">
-        {(meetings || []).map((meeting) => (
-          <div key={meeting.meetingId}>
-            <div className="border rounded p-4 mb-4">
-              <div className="flex">
-                <h2 className="text-2xl font-medium">
-                  <Link href={meeting.path} className="hover:underline">
-                    {meeting.title}
-                  </Link>
-                </h2>
-              </div>
-              <div className="flex mb-3">
-                <div>
-                  <span className="text-muted font-weight-bold">
-                    {meeting.date}
-                  </span>
-                </div>
-              </div>
-              <div className="mb-4">
-                <div className="flex -mx-4">
-                  {meeting.links.map((link, idx) => (
-                    <div key={idx} className="px-4">
-                      <a
-                        href={link.linkUrl}
-                        className="text-teal-700 hover:text-teal-900 hover:underline"
-                      >
-                        {link.linkText}
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <p>{meeting.details}</p>
-            </div>
-          </div>
-        ))}
+        {isLoading || !meetings ? (
+          <Center h="20">
+            <Spinner />
+          </Center>
+        ) : (
+          <Stack>
+            {(meetings || []).map((meeting) => (
+              <Box key={meeting.id} borderWidth="1px" rounded="md" p="4">
+                <Flex>
+                  <Heading as="h2" fontSize="xl" fontWeight="semibold">
+                    <NextLink href={meeting.path} passHref>
+                      <Link>{meeting.title}</Link>
+                    </NextLink>
+                  </Heading>
+                </Flex>
+                <Box mb="2">
+                  <Text color="gray.500">{meeting.date}</Text>
+                </Box>
+                <Box mb="2">
+                  <Stack direction="row" className="flex -mx-4">
+                    {meeting.links.map((link, idx) => (
+                      <Box key={idx}>
+                        <Link
+                          color="blue.500"
+                          fontWeight="medium"
+                          href={link.linkUrl}
+                          isExternal
+                        >
+                          {link.linkText}
+                        </Link>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+                <Text>{meeting.details}</Text>
+              </Box>
+            ))}
+          </Stack>
+        )}
       </Box>
     </Box>
   )
