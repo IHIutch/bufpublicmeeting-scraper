@@ -1,3 +1,5 @@
+import { Container } from '@chakra-ui/react'
+import { Prose } from '@nikolovlazar/chakra-ui-prose'
 import React from 'react'
 import axios from 'redaxios'
 import slugify from 'slugify'
@@ -5,25 +7,27 @@ import { getMeeting } from '../../../utils/axios/meetings'
 
 export default function meetingId({ date, internalLinks, details, title }) {
   return (
-    <div className="container mx-auto px-4 flex">
+    <Container>
       <main role="main">
         <h1 className="text-3xl">{title}</h1>
         <div>{date}</div>
-        <div>{details}</div>
-        <ul className="list-disc pl-4">
-          {internalLinks.map((link, idx) => (
-            <li key={idx}>
-              <a
-                className="text-teal-700 hover:text-teal-900 hover:underline"
-                href={link.linkUrl}
-              >
-                {link.linkText}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <Prose>
+          <div>{details}</div>
+          <ul className="list-disc pl-4">
+            {internalLinks.map((link, idx) => (
+              <li key={idx}>
+                <a
+                  className="text-teal-700 hover:text-teal-900 hover:underline"
+                  href={link.linkUrl}
+                >
+                  {link.linkText}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Prose>
       </main>
-    </div>
+    </Container>
   )
 }
 

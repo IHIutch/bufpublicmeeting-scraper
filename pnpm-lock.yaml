@@ -4,6 +4,7 @@ specifiers:
   '@chakra-ui/react': ^2.2.4
   '@emotion/react': ^11
   '@emotion/styled': ^11
+  '@nikolovlazar/chakra-ui-prose': ^1.2.1
   '@tanstack/react-query': ^4.0.10
   '@tanstack/react-query-devtools': ^4.0.10
   autoprefixer: ^10.4.7
@@ -33,6 +34,7 @@ dependencies:
   '@chakra-ui/react': 2.2.4_mt2tfc76f6zlzjyuwlw3x64f5a
   '@emotion/react': 11.9.3_lxeixztqul6ae7cp3cpkyxlhzm
   '@emotion/styled': 11.9.3_lrdyawhmscavswn6eqk2uibmxm
+  '@nikolovlazar/chakra-ui-prose': 1.2.1_r2simeu4ss7e4cgi5fq24izhhy
   '@tanstack/react-query': 4.0.10_biqbaboplfbrettd7655fr4n2y
   '@tanstack/react-query-devtools': 4.0.10_react@18.2.0
   dayjs: 1.11.4
@@ -2531,6 +2533,18 @@ packages:
     requiresBuild: true
     dev: false
     optional: true
+
+  /@nikolovlazar/chakra-ui-prose/1.2.1_r2simeu4ss7e4cgi5fq24izhhy:
+    resolution: {integrity: sha512-I8EZiKDGkOnzBOkPquLWir1gvHoKpo7x23O+VusK2WhPcWtgR7p56On+e/QPMCitMbV4xW997ecivCohOxGk9Q==}
+    peerDependencies:
+      '@chakra-ui/react': '>=1.8.6'
+      '@chakra-ui/system': '>=1.11.2'
+      react: '>=17.0.2'
+    dependencies:
+      '@chakra-ui/react': 2.2.4_mt2tfc76f6zlzjyuwlw3x64f5a
+      '@chakra-ui/system': 2.2.2_fdnqutfacy7v3gmlcm66flps3q
+      react: 18.2.0
+    dev: false
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
