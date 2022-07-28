@@ -19,12 +19,6 @@ export const handleFilterMeetings = async ({ meetings = [], params = {} }) => {
         meetingDate.isBefore(dateRangeEnd)
       )
     })
-    .filter((m) => {
-      // Meeting Type
-      if (!params?.filter) return true
-      const groupUrlify = slugify(m.meetingGroup)
-      return params.filter.includes(groupUrlify)
-    })
     .map((meeting) => {
       const typeUrlify = slugify(meeting.meetingType)
       const groupUrlify = slugify(meeting.meetingGroup)

@@ -13,8 +13,6 @@ const handler = async (req, res) => {
           meetings,
           params: query,
         })
-
-        console.log()
         res.status(200).json(data)
       } catch (error) {
         res.status(400).json({ error: error.message })

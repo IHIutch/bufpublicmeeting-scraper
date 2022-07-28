@@ -2,11 +2,14 @@ import { useQuery } from '@tanstack/react-query'
 import axios from 'redaxios'
 
 export const useGetMeetings = (params) => {
-  const { isLoading, isError, isSuccess, data, error } = useQuery(
+  const { isLoading, isError, isSuccess, isFetching, data, error } = useQuery(
     ['meetings', params],
     async () => {
       const { data } = await axios.get('/api/meetings', { params })
       return data
+    },
+    {
+      keepPreviousData: true,
     }
   )
   return {
@@ -15,5 +18,6 @@ export const useGetMeetings = (params) => {
     isLoading,
     isError,
     isSuccess,
+    isFetching,
   }
 }

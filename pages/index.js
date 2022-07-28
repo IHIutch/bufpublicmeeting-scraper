@@ -11,12 +11,10 @@ import { useRouter } from 'next/router'
 import { getMeetings } from '../utils/axios/meetings'
 import { useGetMeetings } from '../utils/react-query/meetings'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
-import groupBy from 'lodash/groupBy'
+import uniq from 'lodash/uniq'
 import { Flex } from '@chakra-ui/react'
 import { Heading } from '@chakra-ui/react'
 import { Link } from '@chakra-ui/react'
-import { Center } from '@chakra-ui/react'
-import { Spinner } from '@chakra-ui/react'
 import { handleFilterMeetings } from '../utils/function'
 import slugify from 'slugify'
 import { Tag } from '@chakra-ui/react'
@@ -25,10 +23,7 @@ export default function Home({ filterGroups }) {
   const router = useRouter()
   const query = router.query
 
-  const filterQuery = [].concat(query.filter || [])
-
-  const { data: meetings, isLoading } = useGetMeetings({
-    filter: filterQuery,
+  const { data: meetings } = useGetMeetings({
     sort: query.sort || 'date-desc',
     dateRange: query?.dateRange || [],
   })
@@ -49,7 +44,7 @@ export default function Home({ filterGroups }) {
   const handleSetFilter = (values) => {
     updateRouteQuery({
       filter: values,
-      sort: query.sort || 'date-desc',
+      sort: query.sort || [],
     })
   }
 
@@ -58,6 +53,15 @@ export default function Home({ filterGroups }) {
       filter: query.filter || [],
       sort: value,
     })
+  }
+
+  const filterQuery = [].concat(query.filter || [])
+  const filteredMeetings = (meetings || []).filter((m) =>
+    filterQuery.length ? filterQuery.includes(slugify(m.meetingGroup)) : true
+  )
+
+  const getCount = (value) => {
+    return (meetings || []).filter((m) => m.meetingGroup === value).length
   }
 
   return (
@@ -131,10 +135,10 @@ export default function Home({ filterGroups }) {
                       <Tag
                         flexShrink="0"
                         size="sm"
-                        colorScheme="blue"
+                        colorScheme={getCount(fg.label) ? 'blue' : 'gray'}
                         borderRadius="full"
                       >
-                        {fg.count}
+                        {getCount(fg.label)}
                       </Tag>
                     </Flex>
                   ))}
@@ -145,45 +149,39 @@ export default function Home({ filterGroups }) {
         </div>
       </Box>
       <Box as="main" w={3 / 4} ml="auto" px="3">
-        {isLoading || !meetings ? (
-          <Center h="20">
-            <Spinner />
-          </Center>
-        ) : (
-          <Stack>
-            {(meetings || []).map((meeting) => (
-              <Box key={meeting.id} borderWidth="1px" rounded="md" p="4">
-                <Flex>
-                  <Heading as="h2" fontSize="xl" fontWeight="semibold">
-                    <NextLink href={meeting.path} passHref>
-                      <Link>{meeting.title}</Link>
-                    </NextLink>
-                  </Heading>
-                </Flex>
-                <Box mb="2">
-                  <Text color="gray.500">{meeting.date}</Text>
-                </Box>
-                <Box mb="2">
-                  <Stack direction="row" className="flex -mx-4">
-                    {meeting.links.map((link, idx) => (
-                      <Box key={idx}>
-                        <Link
-                          color="blue.500"
-                          fontWeight="medium"
-                          href={link.linkUrl}
-                          isExternal
-                        >
-                          {link.linkText}
-                        </Link>
-                      </Box>
-                    ))}
-                  </Stack>
-                </Box>
-                <Text>{meeting.details}</Text>
+        <Stack>
+          {(filteredMeetings || []).map((meeting) => (
+            <Box key={meeting.id} borderWidth="1px" rounded="md" p="4">
+              <Flex>
+                <Heading as="h2" fontSize="xl" fontWeight="semibold">
+                  <NextLink href={meeting.path} passHref>
+                    <Link>{meeting.title}</Link>
+                  </NextLink>
+                </Heading>
+              </Flex>
+              <Box mb="2">
+                <Text color="gray.500">{meeting.date}</Text>
               </Box>
-            ))}
-          </Stack>
-        )}
+              <Box mb="2">
+                <Stack direction="row" className="flex -mx-4">
+                  {(meeting?.links || []).map((link, idx) => (
+                    <Box key={idx}>
+                      <Link
+                        color="blue.500"
+                        fontWeight="medium"
+                        href={link.linkUrl || '#'}
+                        isExternal
+                      >
+                        {link.linkText}
+                      </Link>
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+              <Text>{meeting.details}</Text>
+            </Box>
+          ))}
+        </Stack>
       </Box>
     </Box>
   )
@@ -192,23 +190,18 @@ export default function Home({ filterGroups }) {
 export async function getServerSideProps({ query }) {
   const queryClient = new QueryClient()
 
-  const filterQuery = [].concat(query.filter || [])
   const filterParams = {
-    filter: filterQuery,
     sort: query.sort || 'date-desc',
     dateRange: query?.dateRange || [],
   }
 
   const meetings = await getMeetings()
-  const filterGroups = Object.entries(groupBy(meetings, 'meetingGroup'))
-    .map(([key, value]) => ({
-      label: key,
-      value: slugify(key),
-      count: value.length,
+  const filterGroups = uniq(meetings.map((m) => m.meetingGroup))
+    .sort()
+    .map((m) => ({
+      label: m,
+      value: slugify(m),
     }))
-    .sort((a, b) => a.value.localeCompare(b.value))
-
-  console.log(filterGroups)
 
   const data = await handleFilterMeetings({
     meetings,
