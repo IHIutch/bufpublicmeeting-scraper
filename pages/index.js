@@ -93,13 +93,19 @@ export default function Home({ filterGroups }) {
         w={1 / 4}
         position="sticky"
         top="0"
-        h="full"
+        h="100vh"
         overflow="auto"
         px="3"
+        py="4"
       >
         <div className="my-5">
-          <h2 className="font-medium text-2xl mb-2">Sorting &amp; Filters</h2>
-          <Box borderWidth="1px" rounded="md" p="3" mb="4">
+          <Box
+            borderWidth="1px"
+            borderColor="gray.200"
+            rounded="md"
+            p="3"
+            mb="4"
+          >
             <fieldset>
               <Text as="legend" fontWeight="medium" fontSize="lg">
                 Sort by:
@@ -114,17 +120,19 @@ export default function Home({ filterGroups }) {
               </RadioGroup>
             </fieldset>
           </Box>
-          <Box rounded="md" borderWidth="1px" p="3">
-            <RangeCalendar
-              defaultValue={{
-                start: parseDate(dateRateQuery[0]),
-                end: parseDate(dateRateQuery[1]),
-              }}
-              onChange={handleSetDateRange}
-            />
+          <Box rounded="md" borderWidth="1px" borderColor="gray.200" p="3">
+            <Box mb="6">
+              <RangeCalendar
+                defaultValue={{
+                  start: parseDate(dateRateQuery[0]),
+                  end: parseDate(dateRateQuery[1]),
+                }}
+                onChange={handleSetDateRange}
+              />
+            </Box>
 
             <fieldset>
-              <Box mb="2">
+              <Box mb="4">
                 <Text as="legend" fontWeight="medium" fontSize="lg">
                   Filter Meeting Type:
                 </Text>
@@ -160,10 +168,16 @@ export default function Home({ filterGroups }) {
           </Box>
         </div>
       </Box>
-      <Box as="main" w={3 / 4} ml="auto" px="3">
+      <Box as="main" w={3 / 4} ml="auto" px="3" py="4">
         <Stack>
           {(filteredMeetings || []).map((meeting) => (
-            <Box key={meeting.id} borderWidth="1px" rounded="md" p="4">
+            <Box
+              key={meeting.id}
+              borderWidth="1px"
+              borderColor="gray.200"
+              rounded="md"
+              p="4"
+            >
               <Flex>
                 <Heading as="h2" fontSize="xl" fontWeight="semibold">
                   <NextLink href={meeting.path} passHref>
@@ -212,7 +226,7 @@ export async function getServerSideProps({ query }) {
 
   const filterParams = {
     sort: query?.sort || null,
-    range: query?.dateRange || null,
+    range: query?.range || null,
   }
 
   const data = await handleFilterMeetings({
