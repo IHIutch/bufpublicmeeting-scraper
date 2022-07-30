@@ -1,31 +1,43 @@
-import { Checkbox } from '@chakra-ui/react'
-import { Stack } from '@chakra-ui/react'
-import { Button } from '@chakra-ui/react'
-import { RadioGroup } from '@chakra-ui/react'
-import { Text } from '@chakra-ui/react'
-import { Radio } from '@chakra-ui/react'
-import { Box } from '@chakra-ui/react'
-import { CheckboxGroup } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { getMeetings } from '../utils/axios/meetings'
 import { useGetMeetings } from '../utils/react-query/meetings'
 import { dehydrate, QueryClient } from '@tanstack/react-query'
 import uniq from 'lodash/uniq'
-import { Flex } from '@chakra-ui/react'
-import { Heading } from '@chakra-ui/react'
-import { Link } from '@chakra-ui/react'
-import { handleFilterMeetings } from '../utils/function'
+import { defaultFilterConstants, handleFilterMeetings } from '../utils'
 import slugify from 'slugify'
-import { Tag } from '@chakra-ui/react'
+import dynamic from 'next/dynamic'
+import {
+  Checkbox,
+  Stack,
+  Button,
+  RadioGroup,
+  Text,
+  Radio,
+  Box,
+  CheckboxGroup,
+  Flex,
+  Heading,
+  Link,
+  Tag,
+} from '@chakra-ui/react'
+import dayjs from 'dayjs'
+import { parseDate } from '@internationalized/date'
+
+const RangeCalendar = dynamic(() => import('../components/rangeCalendar'), {
+  ssr: false,
+})
 
 export default function Home({ filterGroups }) {
   const router = useRouter()
   const query = router.query
 
+  const sortQuery = query?.sort || defaultFilterConstants.SORT
+  const dateRateQuery = query?.range || defaultFilterConstants.DATE_RANGE
+
   const { data: meetings } = useGetMeetings({
-    sort: query.sort || 'date-desc',
-    dateRange: query?.dateRange || [],
+    sort: query?.sort || null,
+    range: query?.range || null,
   })
 
   const updateRouteQuery = (params) => {
@@ -43,19 +55,29 @@ export default function Home({ filterGroups }) {
 
   const handleSetFilter = (values) => {
     updateRouteQuery({
+      ...query,
       filter: values,
-      sort: query.sort || [],
     })
   }
 
   const handleSetSort = (value) => {
     updateRouteQuery({
-      filter: query.filter || [],
+      ...query,
       sort: value,
     })
   }
 
-  const filterQuery = [].concat(query.filter || [])
+  const handleSetDateRange = ({ start, end }) => {
+    updateRouteQuery({
+      ...query,
+      range: [
+        dayjs(start.toString()).format('YYYY-MM-DD'),
+        dayjs(end.toString()).format('YYYY-MM-DD'),
+      ],
+    })
+  }
+
+  const filterQuery = [].concat(query.filter || defaultFilterConstants.FILTER)
   const filteredMeetings = (meetings || []).filter((m) =>
     filterQuery.length ? filterQuery.includes(slugify(m.meetingGroup)) : true
   )
@@ -82,10 +104,7 @@ export default function Home({ filterGroups }) {
               <Text as="legend" fontWeight="medium" fontSize="lg">
                 Sort by:
               </Text>
-              <RadioGroup
-                value={query?.sort || 'date-desc'}
-                onChange={handleSetSort}
-              >
+              <RadioGroup defaultValue={sortQuery} onChange={handleSetSort}>
                 <Stack>
                   <Radio value="date-desc">Meeting Date (Desc)</Radio>
                   <Radio value="date-asc">Meeting Date (Asc)</Radio>
@@ -95,22 +114,15 @@ export default function Home({ filterGroups }) {
               </RadioGroup>
             </fieldset>
           </Box>
-          <div className="border rounded p-3 mb-4">
-            <label
-              htmlFor="showPrevious"
-              className="cursor-pointer hover:underline flex items-center py-1"
-            >
-              <input
-                id="showPrevious"
-                className="mr-2 cursor-pointer"
-                type="checkbox"
-                name="showPrevious"
-                onChange={(e) => updateRouteQuery(e.target.value)}
-              />
-              <span>Show Past Meetings</span>
-            </label>
-          </div>
           <Box rounded="md" borderWidth="1px" p="3">
+            <RangeCalendar
+              defaultValue={{
+                start: parseDate(dateRateQuery[0]),
+                end: parseDate(dateRateQuery[1]),
+              }}
+              onChange={handleSetDateRange}
+            />
+
             <fieldset>
               <Box mb="2">
                 <Text as="legend" fontWeight="medium" fontSize="lg">
@@ -190,11 +202,6 @@ export default function Home({ filterGroups }) {
 export async function getServerSideProps({ query }) {
   const queryClient = new QueryClient()
 
-  const filterParams = {
-    sort: query.sort || 'date-desc',
-    dateRange: query?.dateRange || [],
-  }
-
   const meetings = await getMeetings()
   const filterGroups = uniq(meetings.map((m) => m.meetingGroup))
     .sort()
@@ -202,6 +209,11 @@ export async function getServerSideProps({ query }) {
       label: m,
       value: slugify(m),
     }))
+
+  const filterParams = {
+    sort: query?.sort || null,
+    range: query?.dateRange || null,
+  }
 
   const data = await handleFilterMeetings({
     meetings,
