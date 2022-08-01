@@ -20,7 +20,7 @@ import {
   Flex,
 } from '@chakra-ui/react'
 import { useButton } from '@react-aria/button'
-import { isSameDay } from '@internationalized/date'
+import { isSameDay, isToday } from '@internationalized/date'
 
 export default function RangeCalendar(props) {
   const { locale } = useLocale()
@@ -96,8 +96,8 @@ const CalendarCell = ({ state, date }) => {
     buttonProps,
     isSelected,
     isOutsideVisibleRange,
-    isDisabled,
-    isUnavailable,
+    // isDisabled,
+    // isUnavailable,
     formattedDate,
   } = useCalendarCell({ date }, state, ref)
 
@@ -110,24 +110,40 @@ const CalendarCell = ({ state, date }) => {
     ? isSameDay(date, state.highlightedRange.end)
     : isSelected
 
+  // const isNextMonthInRange = isSameMonth(date, state.highlightedRange.end)
+  // const isPrevMonthInRange = isSameMonth(date, state.highlightedRange.start)
+
   return (
     <Td border="none" p="0" textAlign="center" h="9" {...cellProps}>
       <Flex
         {...buttonProps}
         ref={ref}
-        hidden={isOutsideVisibleRange}
         bg={isSelected && 'blue.50'}
         boxSize="full"
         roundedLeft={isSelectionStart && 'full'}
         roundedRight={isSelectionEnd && 'full'}
+        hidden={isOutsideVisibleRange}
       >
         <Flex
           boxSize="full"
-          rounded={(isSelectionStart || isSelectionEnd) && 'full'}
-          color={(isSelectionStart || isSelectionEnd) && 'white'}
+          rounded="full"
+          color={
+            isSelectionStart || isSelectionEnd
+              ? 'white'
+              : isOutsideVisibleRange
+              ? 'gray.500'
+              : 'inherit'
+          }
           bg={(isSelectionStart || isSelectionEnd) && 'blue.500'}
           align="center"
           justify="center"
+          sx={
+            isToday(date) && {
+              borderWidth: '2px',
+              borderStyle: 'solid',
+              borderColor: 'blue.600',
+            }
+          }
         >
           {formattedDate}
         </Flex>

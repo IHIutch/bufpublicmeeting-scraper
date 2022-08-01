@@ -5,8 +5,6 @@ import qs from 'qs'
 const handler = async (req, res) => {
   const { method, query } = req
 
-  console.log(qs.parse(query))
-
   switch (method) {
     // Get
     case 'GET':

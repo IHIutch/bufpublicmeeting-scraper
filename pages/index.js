@@ -123,7 +123,7 @@ export default function Home({ filterGroups }) {
           <Box rounded="md" borderWidth="1px" borderColor="gray.200" p="3">
             <Box mb="6">
               <RangeCalendar
-                defaultValue={{
+                value={{
                   start: parseDate(dateRateQuery[0]),
                   end: parseDate(dateRateQuery[1]),
                 }}
