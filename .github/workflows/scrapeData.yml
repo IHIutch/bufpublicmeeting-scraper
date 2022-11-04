@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
 
       - name: Install Scrapy
         run: pip install scrapy
@@ -28,8 +28,15 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: master
+          branch: data
           folder: .
-          target-folder: data
-          clean: false
           commit-message: "Update data"
+
+  trigger-rebuild:
+    needs: scrape
+    name: Build & Deploy Site
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger rebuild
+        run: https://api.vercel.com/v1/integrations/deploy/prj_bjjjFEReVfuAAysixfiYino2HSn9/iMLmv5J1Fc
