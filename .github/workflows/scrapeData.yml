@@ -35,8 +35,7 @@ jobs:
   trigger-rebuild:
     needs: scrape
     runs-on: ubuntu-latest
+    name: Trigger Rebuild
 
     steps:
-      - name: Trigger Rebuild
-        shell: bash
-        run: curl -X POST https://api.vercel.com/v1/integrations/deploy/prj_bjjjFEReVfuAAysixfiYino2HSn9/iMLmv5J1Fc
+    - run: curl -X POST https://api.vercel.com/v1/integrations/deploy/prj_bjjjFEReVfuAAysixfiYino2HSn9/iMLmv5J1Fc
