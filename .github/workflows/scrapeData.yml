@@ -29,6 +29,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: master
+          folder: .
           target-folder: data
           clean: false
           commit-message: "Update data"
