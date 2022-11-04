@@ -22,16 +22,16 @@ jobs:
         run: pip install scrapy
 
       - name: Fetch latest data
-        run: scrapy runspider scraper/spiders/meetingScraper.py --loglevel=INFO -O data/index.json
+        run: scrapy runspider scraper/spiders/meetingScraper.py --loglevel=INFO -O index.json
 
       - name: Commit changes
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: data
-          FOLDER: data
-          COMMIT_MESSAGE: "Update data"
-          CLEAN: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: master
+          target-folder: data
+          clean: false
+          commit-message: "Update data"
 
   job2:
     needs: job1
