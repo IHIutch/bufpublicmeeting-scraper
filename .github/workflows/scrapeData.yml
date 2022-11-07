@@ -22,14 +22,14 @@ jobs:
         run: pip install scrapy
 
       - name: Fetch latest data
-        run: scrapy runspider scraper/spiders/meetingScraper.py --loglevel=INFO -O index.json
+        run: scrapy runspider scraper/spiders/meetingScraper.py --loglevel=INFO -O output/index.json
 
       - name: Commit changes
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: data
-          folder: .
+          folder: output
           commit-message: "Update data"
 
   trigger-rebuild:
